@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Play, TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X, Film, Target, Heart } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useInView, useSpring, useMotionValue, useTransform } from "framer-motion";
+import { TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X, Film, Target } from "lucide-react";
 
 // ==========================================
 // 🎛️ AYARLAR VE VERİ YÖNETİM PANELİ
@@ -15,7 +15,6 @@ const SITE_DATA = {
     instagram: "https://www.instagram.com/gizligaraj",
     youtube: "https://www.youtube.com/@gizligaraj",
   },
-  // YENİ EKLENEN BÖLÜM: NEDEN BİZ?
   features: [
     {
       title: "BELGESEL TADINDA",
@@ -33,10 +32,11 @@ const SITE_DATA = {
       icon: Target
     }
   ],
+  // ⚡ DİKKAT: Rakamları ve harfleri ayırdık (Animasyon için gerekli)
   stats: [
-    { value: "3.1M+", label: "Tek Video İzlenme Rekoru", icon: Zap },
-    { value: "17.5M+", label: "Son 30 Günlük Erişim", icon: Users },
-    { value: "%100", label: "Organik Büyüme", icon: TrendingUp },
+    { number: 3.1, suffix: "M+", label: "Tek Video İzlenme Rekoru", icon: Zap },
+    { number: 17.5, suffix: "M+", label: "Son 30 Günlük Erişim", icon: Users },
+    { number: 100, suffix: "%", label: "Organik Büyüme", icon: TrendingUp },
   ],
   portfolio: [
     {
@@ -84,7 +84,6 @@ const SectionHeading = ({ children, subtitle }: { children: React.ReactNode; sub
   </div>
 );
 
-// YENİ ÖZELLİK KARTI
 const FeatureCard = ({ title, desc, icon: Icon, delay }: { title: string; desc: string; icon: any; delay: number }) => (
   <motion.div
     initial={{ opacity: 0, x: -20 }}
@@ -101,7 +100,36 @@ const FeatureCard = ({ title, desc, icon: Icon, delay }: { title: string; desc: 
   </motion.div>
 );
 
-const StatCard = ({ value, label, icon: Icon, delay }: { value: string; label: string; icon: any; delay: number }) => (
+// ⚡ YENİ: SAYIM YAPAN RAKAM BİLEŞENİ
+const AnimatedNumber = ({ value, suffix }: { value: number, suffix: string }) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+  const motionValue = useMotionValue(0);
+  const springValue = useSpring(motionValue, { duration: 2000, bounce: 0 });
+
+  useEffect(() => {
+    if (isInView) {
+      motionValue.set(value);
+    }
+  }, [isInView, value, motionValue]);
+
+  const displayValue = useTransform(springValue, (latest) => {
+    if (Number.isInteger(value)) {
+      return Math.round(latest).toString(); // Tam sayıysa virgül koyma
+    }
+    return latest.toFixed(1); // Ondalıklıysa 1 basamak göster (örn: 17.5)
+  });
+
+  return (
+    <span ref={ref} className="flex">
+      <motion.span>{displayValue}</motion.span>
+      <span>{suffix}</span>
+    </span>
+  );
+};
+
+const StatCard = ({ number, suffix, label, icon: Icon, delay }: { number: number; suffix: string; label: string; icon: any; delay: number }) => (
   <motion.div
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -111,7 +139,9 @@ const StatCard = ({ value, label, icon: Icon, delay }: { value: string; label: s
   >
     <div className="absolute top-0 right-0 -mt-6 -mr-6 h-32 w-32 rounded-full bg-garage-yellow/5 blur-2xl group-hover:bg-garage-yellow/10 transition-all duration-500" />
     <Icon className="w-8 h-8 text-garage-yellow mb-4 opacity-80" />
-    <h3 className="text-5xl md:text-6xl font-bold text-white font-oswald tracking-tighter">{value}</h3>
+    <h3 className="text-5xl md:text-6xl font-bold text-white font-oswald tracking-tighter flex items-center">
+      <AnimatedNumber value={number} suffix={suffix} />
+    </h3>
     <p className="text-garage-gray mt-2 text-sm uppercase tracking-wider font-medium">{label}</p>
   </motion.div>
 );
@@ -322,7 +352,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- NEW: FEATURES / WHY US? --- */}
+      {/* --- FEATURES --- */}
       <section className="py-24 bg-[#080808] border-t border-white/5">
         <div className="container mx-auto px-6">
           <SectionHeading subtitle="FARKLILIK">NEDEN GİZLİ GARAJ?</SectionHeading>
@@ -335,7 +365,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- STATS SECTION --- */}
+      {/* --- STATS SECTION (ANIMATED) --- */}
       <section className="py-24 bg-[#080808] relative border-y border-white/5">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mb-16">
@@ -344,7 +374,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {SITE_DATA.stats.map((stat, index) => (
-              <StatCard key={index} icon={stat.icon} value={stat.value} label={stat.label} delay={0.1 * (index + 1)} />
+              <StatCard key={index} icon={stat.icon} number={stat.number} suffix={stat.suffix} label={stat.label} delay={0.1 * (index + 1)} />
             ))}
           </div>
         </div>
