@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X } from "lucide-react";
+import { Play, TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X, Film, Target, Heart } from "lucide-react";
 
 // ==========================================
 // 🎛️ AYARLAR VE VERİ YÖNETİM PANELİ
@@ -10,19 +10,34 @@ import { Play, TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Cop
 const SITE_DATA = {
   contact: {
     email: "infogizligaraj@gmail.com",
-    // ✅ NUMARAN ENTEGRE EDİLDİ (Uluslararası Format)
     phone: "905514518662",
-    whatsappMessage: "Merhaba, Gizli Garaj ile işbirliği yapmak istiyoruz.", // İlk açılış mesajı
+    whatsappMessage: "Merhaba, Gizli Garaj ile işbirliği yapmak istiyoruz.",
     instagram: "https://www.instagram.com/gizligaraj",
     youtube: "https://www.youtube.com/@gizligaraj",
   },
+  // YENİ EKLENEN BÖLÜM: NEDEN BİZ?
+  features: [
+    {
+      title: "BELGESEL TADINDA",
+      desc: "Sıkıcı teknik veriler değil, hikaye anlatıyoruz. İzleyici reklam olduğunu anlamadan videoyu sonuna kadar nefessiz izler.",
+      icon: Film
+    },
+    {
+      title: "PREMIUM PRODÜKSİYON",
+      desc: "Telefonla çekilmiş vloglar değil; sinema kameraları, renk düzenleme ve ses tasarımı ile markanızı 'Prestige' seviyesinde sunuyoruz.",
+      icon: Zap
+    },
+    {
+      title: "%100 OTOMOBİL TUTKUNU",
+      desc: "Genel izleyici değil; araba alan, modifiye yapan, bu kültürü yaşayan 'Alım Gücü Yüksek' ve sadık bir kitleye hitap ediyoruz.",
+      icon: Target
+    }
+  ],
   stats: [
     { value: "3.1M+", label: "Tek Video İzlenme Rekoru", icon: Zap },
     { value: "17.5M+", label: "Son 30 Günlük Erişim", icon: Users },
     { value: "%100", label: "Organik Büyüme", icon: TrendingUp },
   ],
-  // VIRAL VIDEOLAR (Instagram)
-  // Not: Linkleri ve Thumbnailleri buradan güncelleyebilirsin.
   portfolio: [
     {
       id: 1,
@@ -67,6 +82,23 @@ const SectionHeading = ({ children, subtitle }: { children: React.ReactNode; sub
     </h2>
     <div className="h-1 w-24 bg-garage-yellow mt-6" />
   </div>
+);
+
+// YENİ ÖZELLİK KARTI
+const FeatureCard = ({ title, desc, icon: Icon, delay }: { title: string; desc: string; icon: any; delay: number }) => (
+  <motion.div
+    initial={{ opacity: 0, x: -20 }}
+    whileInView={{ opacity: 1, x: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5, delay }}
+    className="border-l-2 border-white/10 pl-6 hover:border-garage-yellow transition-colors duration-300 group"
+  >
+    <div className="mb-4 bg-white/5 w-12 h-12 flex items-center justify-center rounded-lg group-hover:bg-garage-yellow group-hover:text-black transition-all">
+      <Icon className="w-6 h-6" />
+    </div>
+    <h3 className="text-2xl font-bold font-oswald text-white mb-2 uppercase">{title}</h3>
+    <p className="text-gray-400 text-sm leading-relaxed font-light">{desc}</p>
+  </motion.div>
 );
 
 const StatCard = ({ value, label, icon: Icon, delay }: { value: string; label: string; icon: any; delay: number }) => (
@@ -133,7 +165,6 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Mail Kopyalama Fonksiyonu
   const handleCopyMail = () => {
     navigator.clipboard.writeText(SITE_DATA.contact.email);
     setCopied(true);
@@ -143,11 +174,10 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-garage-black text-white font-inter overflow-x-hidden selection:bg-garage-yellow selection:text-black">
 
-      {/* --- PREMIUM CONTACT MODAL (POPUP) --- */}
+      {/* --- PREMIUM CONTACT MODAL --- */}
       <AnimatePresence>
         {isModalOpen && (
           <>
-            {/* Backdrop Blur */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -156,7 +186,6 @@ export default function Home() {
               className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90]"
             />
 
-            {/* Modal Content */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -164,7 +193,6 @@ export default function Home() {
               className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none"
             >
               <div className="bg-[#111] border border-white/10 w-full max-w-md p-8 rounded-2xl shadow-2xl relative pointer-events-auto">
-                {/* Close Button */}
                 <button
                   onClick={() => setIsModalOpen(false)}
                   className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
@@ -176,7 +204,6 @@ export default function Home() {
                 <p className="text-gray-400 text-center text-sm mb-8">Markanızı tanıtmak için en uygun yöntemi seçin.</p>
 
                 <div className="space-y-4">
-                  {/* WhatsApp Option */}
                   <a
                     href={`https://wa.me/${SITE_DATA.contact.phone}?text=${encodeURIComponent(SITE_DATA.contact.whatsappMessage)}`}
                     target="_blank"
@@ -193,7 +220,6 @@ export default function Home() {
                     <ArrowRight className="ml-auto w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </a>
 
-                  {/* Mail Option */}
                   <button
                     onClick={handleCopyMail}
                     className="flex items-center gap-4 w-full p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all active:scale-95 group"
@@ -218,7 +244,6 @@ export default function Home() {
 
       {/* --- HERO SECTION --- */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-
         <div className="absolute inset-0 z-0 pointer-events-none select-none">
           <div className="absolute inset-0 bg-gradient-to-t from-garage-black via-garage-black/80 to-transparent z-10" />
           <div className="absolute inset-0 bg-black/60 z-[5]" />
@@ -244,7 +269,6 @@ export default function Home() {
               Otomobil Dünyasının <span className="text-white font-semibold">Suç Dosyaları</span> <br /> & Viral İçerik Stüdyosu.
             </p>
 
-            {/* YENİ MODAL TETİKLEYİCİ BUTON */}
             <button
               onClick={() => setIsModalOpen(true)}
               className="relative z-50 inline-flex items-center gap-3 bg-garage-yellow text-black font-bold py-4 px-8 md:px-10 rounded-sm text-lg uppercase tracking-widest hover:bg-white hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.3)] cursor-pointer"
@@ -298,6 +322,19 @@ export default function Home() {
         </div>
       </section>
 
+      {/* --- NEW: FEATURES / WHY US? --- */}
+      <section className="py-24 bg-[#080808] border-t border-white/5">
+        <div className="container mx-auto px-6">
+          <SectionHeading subtitle="FARKLILIK">NEDEN GİZLİ GARAJ?</SectionHeading>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {SITE_DATA.features.map((feature, i) => (
+              <FeatureCard key={i} title={feature.title} desc={feature.desc} icon={feature.icon} delay={0.2 * i} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* --- STATS SECTION --- */}
       <section className="py-24 bg-[#080808] relative border-y border-white/5">
         <div className="container mx-auto px-6">
@@ -329,6 +366,68 @@ export default function Home() {
                 tags={video.tags}
               />
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* --- AUDIENCE --- */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute right-0 top-1/4 w-1/2 h-1/2 bg-garage-yellow/5 blur-[120px] rounded-full" />
+
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-8 md:p-16">
+            <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center">
+              <div>
+                <SectionHeading subtitle="HEDEF KİTLE">KİM BİZİ İZLİYOR?</SectionHeading>
+                <div className="space-y-8 mt-10">
+                  <div>
+                    <div className="flex justify-between text-base font-bold uppercase tracking-widest mb-3">
+                      <span>Erkek</span>
+                      <span className="text-garage-yellow">92%</span>
+                    </div>
+                    <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: "92%" }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.5, ease: "circOut" }}
+                        className="h-full bg-garage-yellow"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-base font-bold uppercase tracking-widest mb-3">
+                      <span>Yaş 18-34</span>
+                      <span className="text-garage-yellow">85%</span>
+                    </div>
+                    <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: "85%" }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.5, ease: "circOut", delay: 0.2 }}
+                        className="h-full bg-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {['Mühendislik', 'Modifiye', 'Teknoloji', 'Motorsporları', 'Restorasyon', 'Sokak Kültürü'].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex items-center justify-center p-6 border border-white/10 rounded-lg bg-black/40 hover:bg-garage-yellow hover:border-garage-yellow hover:text-black transition-all duration-300 cursor-default group"
+                  >
+                    <span className="font-bold uppercase tracking-wider text-xs md:text-sm text-center">{item}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
