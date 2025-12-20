@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useScroll, useTransform, useSpring, useInView, useMotionValue } from "framer-motion";
-import { TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X, Film, Target, MonitorPlay, Package, Megaphone } from "lucide-react";
+import { motion, AnimatePresence, useInView, useSpring, useMotionValue, useTransform, useScroll } from "framer-motion";
+import { TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X, Film, Target, MonitorPlay, Package, Megaphone, ChevronDown } from "lucide-react";
 
 // ==========================================
 // 🎛️ AYARLAR VE VERİ YÖNETİM PANELİ
@@ -226,22 +226,18 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // --- PARALLAX VE SCROLL AYARLARI ---
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"]
-  });
+  // --- GARAJ KAPISI ANİMASYON AYARLARI ---
+  const { scrollYProgress } = useScroll();
 
-  // Hero animasyonları: Scroll yaptıkça scale artar, opacity düşer
-  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 50]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
-  const heroTextY = useTransform(scrollYProgress, [0, 0.5], [0, 500]);
+  // Kapının Y pozisyonu: Scroll 0'dan 0.4'e gelirken, kapı 0%'dan -100%'e (yukarı) gider.
+  // "clamp: true" animasyonun bitince orada kalmasını sağlar.
+  const doorY = useTransform(scrollYProgress, [0, 0.4], ["0%", "-100%"], { clamp: true });
 
-  // İçerik animasyonu: Hero bittikten sonra içerik yukarı kayar
-  const contentY = useTransform(scrollYProgress, [0.4, 1], ["100vh", "0vh"]);
-  const contentOpacity = useTransform(scrollYProgress, [0.4, 0.6], [0, 1]);
+  // Kapıdaki yazının opaklığı: Kapı açılırken yazı yavaşça kaybolur.
+  const textOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0], { clamp: true });
 
+  // Kapıdaki görselin hafif zoom efekti: Derinlik hissi için.
+  const bgScale = useTransform(scrollYProgress, [0, 0.4], [1, 1.1], { clamp: true });
 
   const handleCopyMail = () => {
     navigator.clipboard.writeText(SITE_DATA.contact.email);
@@ -320,67 +316,85 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* ⭐⭐⭐ SCROLLYTELLING HERO SECTION ⭐⭐⭐ 
-        Burada sayfa yüksekliği sanal olarak 250vh (ekranın 2.5 katı) yapılır.
-        Kullanıcı scroll yaptıkça "sticky" olan içerik değişir.
+      {/* ⭐⭐⭐ GARAJ KAPISI (HERO SECTION) ⭐⭐⭐ 
+        Bu bölüm 'fixed' olarak en üstte durur ve scroll ile yukarı kayar.
       */}
-      <div ref={containerRef} className="relative h-[250vh]">
+      <motion.section
+        style={{ y: doorY }} // Kapının yukarı hareketi
+        className="fixed inset-0 z-50 h-screen w-full overflow-hidden bg-garage-black flex flex-col items-center justify-center shadow-2xl"
+      >
 
-        <div className="sticky top-0 h-screen overflow-hidden flex flex-col items-center justify-center">
-
-          {/* ARKA PLAN RESMİ (Zoom Effect) */}
-          <div className="absolute inset-0 z-0 pointer-events-none select-none">
-            <div className="absolute inset-0 bg-gradient-to-t from-garage-black via-garage-black/80 to-transparent z-20" />
-            <div className="absolute inset-0 bg-black/50 z-[10]" />
-            <motion.img
-              style={{ scale: useTransform(scrollYProgress, [0, 1], [1, 1.5]) }} // Hafif zoom
+        {/* KAPININ ARKA PLAN GÖRSELİ (Hafif Zoom Efektli) */}
+        <div className="absolute inset-0 z-0 pointer-events-none select-none">
+          <div className="absolute inset-0 bg-gradient-to-t from-garage-black via-garage-black/90 to-garage-black/50 z-20" />
+          <motion.div style={{ scale: bgScale }} className="absolute inset-0">
+            <img
               src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=2560&auto=format&fit=crop"
               alt="Garage Atmosphere"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover opacity-60"
             />
-          </div>
+          </motion.div>
+        </div>
 
-          {/* ZOOM YAPILACAK DEV YAZI */}
+        {/* KAPININ ÜZERİNDEKİ YAZI (Yukarı kalkarken silikleşir) */}
+        <motion.div
+          style={{ opacity: textOpacity }}
+          className="relative z-30 text-center px-4"
+        >
           <motion.div
-            style={{ scale: heroScale, opacity: heroOpacity, y: heroTextY }}
-            className="relative z-30 text-center origin-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h1 className="text-[13vw] md:text-[8vw] leading-[0.85] font-bold font-oswald text-transparent bg-clip-text bg-gradient-to-b from-white to-neutral-600 tracking-tighter mb-6 whitespace-nowrap">
+            <h1 className="text-[15vw] md:text-[12vw] leading-[0.85] font-bold font-oswald text-white tracking-tighter mb-4 whitespace-nowrap drop-shadow-2xl">
               GİZLİ <span className="text-garage-yellow">GARAJ</span>
             </h1>
-            <p className="text-xl md:text-3xl text-gray-300 font-light tracking-wide max-w-2xl mx-auto border-l-4 border-garage-yellow pl-6">
-              Otomobil Dünyasının <span className="text-white font-semibold">Suç Dosyaları</span>
-            </p>
           </motion.div>
-
-          {/* SCROLL İPUCU */}
-          <motion.div
-            style={{ opacity: useTransform(scrollYProgress, [0, 0.2], [1, 0]) }}
-            className="absolute bottom-10 left-1/2 -translate-x-1/2 text-gray-500 flex flex-col items-center gap-2 z-40"
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="text-xl md:text-3xl text-gray-300 font-light tracking-wide max-w-2xl mx-auto border-b-4 border-garage-yellow pb-4 md:pb-6 drop-shadow-lg"
           >
-            <span className="text-[10px] uppercase tracking-[0.3em] animate-pulse">Girmek İçin Kaydır</span>
-            <div className="w-[1px] h-12 bg-gradient-to-b from-garage-yellow to-transparent" />
+            Otomobil Dünyasının <span className="text-white font-semibold">Suç Dosyaları</span>
+          </motion.p>
+
+          {/* SCROLL İPUCU İKONU */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, y: [0, 10, 0] }}
+            transition={{ delay: 1, duration: 2, repeat: Infinity }}
+            className="absolute left-1/2 -translate-x-1/2 mt-16 md:mt-24 flex flex-col items-center text-garage-yellow/70"
+          >
+            <span className="text-sm uppercase tracking-[0.3em] mb-2 font-bold">Giriş Yap</span>
+            <ChevronDown className="w-8 h-8 animate-bounce" />
           </motion.div>
+        </motion.div>
+      </motion.section>
 
-        </div>
-      </div>
-
-      {/* ⭐⭐⭐ MAIN CONTENT ⭐⭐⭐ 
-        Hero zoom yapıp yok olduktan sonra bu kısım alttan gelir.
+      {/* ⭐⭐⭐ SANAL SCROLL BOŞLUĞU ⭐⭐⭐ 
+        Kapının açılması için gereken kaydırma mesafesi.
+        Bu boşluk olmazsa kapı anında yukarı fırlar.
       */}
-      <div className="relative z-40 bg-garage-black -mt-[100vh]"> {/* Negatif margin ile üstüne bindiriyoruz */}
+      <div className="h-[130vh] pointer-events-none" />
 
-        {/* Buton ve Geri Kalan İçerik */}
-        <div className="container mx-auto px-6 pb-24 relative z-50 text-center">
+      {/* ⭐⭐⭐ ANA İÇERİK (KAPININ ALTINDAN ÇIKAN KISIM) ⭐⭐⭐ 
+        Relative ve z-index ile kapının altında durur.
+      */}
+      <div className="relative z-40 bg-garage-black shadow-[0_-50px_100px_rgba(0,0,0,1)]">
+
+        {/* İŞBİRLİĞİ BUTONU (İlk karşılayan eleman) */}
+        <div className="container mx-auto px-6 py-24 relative z-50 text-center">
           <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-3 bg-garage-yellow text-black font-bold py-4 px-8 md:px-10 rounded-sm text-lg uppercase tracking-widest hover:bg-white hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.3)] cursor-pointer mb-24"
+            className="inline-flex items-center gap-3 bg-garage-yellow text-black font-bold py-5 px-10 md:px-12 rounded-sm text-xl uppercase tracking-widest hover:bg-white hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_50px_rgba(255,215,0,0.4)] cursor-pointer"
           >
             İşbirliği Başlat
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-6 h-6" />
           </motion.button>
         </div>
 
