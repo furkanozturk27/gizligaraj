@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useId } from "react";
 import { motion, AnimatePresence, useInView, useSpring, useMotionValue, useTransform, useScroll } from "framer-motion";
-import { TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X, Film, Target, MonitorPlay, Package, Megaphone, MapPin, BarChart3, Activity } from "lucide-react";
+import { TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X, Film, Target, MonitorPlay, Package, Megaphone, MapPin, BarChart3, Activity, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ==========================================
@@ -293,7 +293,7 @@ const AnimatedNumber = ({ value, suffix }: { value: number, suffix: string }) =>
   }, [isInView, value, motionValue]);
 
   const displayValue = useTransform(springValue, (latest) => {
-    if (Number.isInteger(latest)) {
+    if (Number.isInteger(value)) {
       return Math.round(latest).toString();
     }
     return latest.toFixed(1);
@@ -369,23 +369,54 @@ const VideoCard = ({ title, views, link, thumbnail, tags }: { title: string; vie
   );
 };
 
+// ⚡ YENİLENMİŞ DİKKAT ÇEKİCİ İŞBİRLİĞİ BUTONU
+const CtaButton = ({ onClick, className }: { onClick?: () => void, className?: string }) => {
+  return (
+    <motion.button
+      initial={{ opacity: 0, scale: 0.9 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onClick}
+      className={cn(
+        "relative group inline-flex items-center gap-4 bg-garage-yellow text-black font-bold py-6 px-12 rounded-lg text-xl uppercase tracking-widest overflow-hidden shadow-[0_0_60px_rgba(255,215,0,0.5)] cursor-pointer",
+        className
+      )}
+    >
+      {/* Arka Plan Parlama Efekti */}
+      <div className="absolute inset-0 bg-white/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+      {/* Yanıp Sönen Işık Efekti */}
+      <motion.div
+        className="absolute -inset-1 bg-gradient-to-r from-transparent via-white/30 to-transparent blur-sm group-hover:via-white/50"
+        animate={{ x: ['-100%', '200%'] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+      />
+
+      <span className="relative z-10">İşbirliği Başlat</span>
+      <ArrowRight className="relative z-10 w-7 h-7 group-hover:translate-x-1 transition-transform" />
+    </motion.button>
+  )
+}
+
 export default function Home() {
   const [copied, setCopied] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // --- ZOOM PARALLAX & SCROLL AYARLARI (Geri Getirildi) ---
+  // --- ZOOM PARALLAX & SCROLL AYARLARI ---
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"]
   });
 
-  // Hero animasyonları: Scroll yaptıkça scale artar (zoom), opacity düşer
+  // Hero animasyonları
   const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 50]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
   const heroTextY = useTransform(scrollYProgress, [0, 0.5], [0, 500]);
 
-  // İçerik animasyonu: Hero bittikten sonra içerik yukarı kayar
+  // İçerik animasyonu
   const contentY = useTransform(scrollYProgress, [0.4, 1], ["100vh", "0vh"]);
 
 
@@ -466,12 +497,12 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* ⭐⭐⭐ ZOOM PARALLAX HERO SECTION (Geri Getirildi) ⭐⭐⭐ */}
+      {/* ⭐⭐⭐ ZOOM PARALLAX HERO SECTION ⭐⭐⭐ */}
       <div ref={containerRef} className="relative h-[250vh]">
 
         <div className="sticky top-0 h-screen overflow-hidden flex flex-col items-center justify-center">
 
-          {/* ARKA PLAN + SPARKLES (ZOOMLU) */}
+          {/* ARKA PLAN + SPARKLES */}
           <div className="absolute inset-0 z-0 pointer-events-none select-none">
             <div className="absolute inset-0 bg-gradient-to-t from-garage-black via-garage-black/80 to-transparent z-20" />
             <div className="absolute inset-0 bg-black/50 z-[10]" />
@@ -481,7 +512,6 @@ export default function Home() {
               alt="Garage Atmosphere"
               className="w-full h-full object-cover"
             />
-            {/* ✨✨✨ KIVILCIM EFEKTİ BURADA ✨✨✨ */}
             <SparklesCore
               id="tsparticlesfullpage"
               background="transparent"
@@ -512,7 +542,7 @@ export default function Home() {
             className="absolute bottom-10 left-1/2 -translate-x-1/2 text-gray-500 flex flex-col items-center gap-2 z-40"
           >
             <span className="text-[10px] uppercase tracking-[0.3em] animate-pulse">Girmek İçin Kaydır</span>
-            <div className="w-[1px] h-12 bg-gradient-to-b from-garage-yellow to-transparent" />
+            <ChevronDown className="w-8 h-8 animate-bounce" />
           </motion.div>
 
         </div>
@@ -521,18 +551,9 @@ export default function Home() {
       {/* ⭐⭐⭐ ANA İÇERİK (ZOOM EFEKTİNDEN SONRA GELEN KISIM) ⭐⭐⭐ */}
       <div className="relative z-40 bg-garage-black -mt-[100vh]">
 
-        {/* Buton */}
+        {/* YENİLENMİŞ İŞBİRLİĞİ BUTONU */}
         <div className="container mx-auto px-6 pb-24 relative z-50 text-center">
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-3 bg-garage-yellow text-black font-bold py-4 px-8 md:px-10 rounded-sm text-lg uppercase tracking-widest hover:bg-white hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.3)] cursor-pointer mb-24"
-          >
-            İşbirliği Başlat
-            <ArrowRight className="w-5 h-5" />
-          </motion.button>
+          <CtaButton onClick={() => setIsModalOpen(true)} className="mb-24" />
         </div>
 
         {/* MİSYON */}
@@ -593,7 +614,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ⭐⭐⭐ HEDEF KİTLE ANALİZİ (YENİLENEN GRAFİKLERLE) ⭐⭐⭐ */}
+        {/* ⭐⭐⭐ HEDEF KİTLE ANALİZİ (YÜZDELER SABİTLENDİ) ⭐⭐⭐ */}
         <section className="py-24 relative overflow-hidden bg-[#0a0a0a]">
           <div className="absolute right-0 top-1/4 w-1/2 h-1/2 bg-garage-yellow/5 blur-[120px] rounded-full" />
 
@@ -661,7 +682,7 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              {/* 3. KUTU: YAŞ DAĞILIMI */}
+              {/* 3. KUTU: YAŞ DAĞILIMI (YÜZDELER SABİTLENDİ) */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -676,7 +697,8 @@ export default function Home() {
                 <div className="flex items-end justify-between h-48 gap-4">
                   {SITE_DATA.audience.ages.map((age, i) => (
                     <div key={i} className="flex flex-col items-center gap-2 flex-1 group">
-                      <span className="text-garage-yellow font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity">%{age.value}</span>
+                      {/* ⚡ GÜNCELLEME: Yüzde değeri artık hep görünür */}
+                      <span className="text-garage-yellow font-bold text-sm transition-opacity">%{age.value}</span>
                       <div className="w-full bg-white/10 rounded-t-lg relative overflow-hidden flex-1 flex items-end">
                         <motion.div initial={{ height: 0 }} whileInView={{ height: `${age.value * 2}%` }} viewport={{ once: true }} transition={{ duration: 1, delay: i * 0.1 }} className={`w-full ${i === 0 ? 'bg-white' : i === 1 ? 'bg-garage-yellow' : 'bg-gray-600'}`} />
                       </div>
@@ -712,12 +734,10 @@ export default function Home() {
         <footer className="py-24 bg-black border-t border-white/10">
           <div className="container mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-5xl font-bold font-oswald text-white mb-10">BİRLİKTE TARİH YAZALIM</h2>
-            <button onClick={() => setIsModalOpen(true)} className="group relative inline-block mb-16 z-50">
-              <span className="text-3xl md:text-6xl font-bold text-garage-yellow group-hover:text-white transition-colors">
-                {SITE_DATA.contact.email}
-              </span>
-              <span className="absolute -bottom-2 left-0 w-full h-1 bg-garage-yellow origin-left transform scale-x-100 group-hover:scale-x-0 transition-transform duration-300"></span>
-            </button>
+
+            {/* YENİLENMİŞ FOOTER BUTONU */}
+            <CtaButton onClick={() => setIsModalOpen(true)} className="mb-16" />
+
             <div className="flex justify-center gap-8 mb-12 relative z-50">
               <a href={SITE_DATA.contact.instagram} target="_blank" rel="noopener noreferrer" className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
                 <Instagram className="w-6 h-6" />
