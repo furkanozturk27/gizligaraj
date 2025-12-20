@@ -1,16 +1,18 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
-import { Play, TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail } from "lucide-react";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Play, TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X } from "lucide-react";
 
 // ==========================================
-// 🎛️ AYARLAR (Kullanıcı Verileri Korundu)
+// 🎛️ AYARLAR VE VERİ YÖNETİM PANELİ (GÜNCELLE)
 // ==========================================
 const SITE_DATA = {
   contact: {
     email: "infogizligaraj@gmail.com",
-    emailSubject: "Gizli Garaj İşbirliği Talebi",
+    // 👇 WHATSAPP NUMARANI BURAYA YAZ (Başında +90 olmadan, örn: 905551234567)
+    phone: "905555555555",
+    whatsappMessage: "Merhaba, Gizli Garaj ile işbirliği yapmak istiyoruz.", // Otomatik ilk mesaj
     instagram: "https://www.instagram.com/gizligaraj",
     youtube: "https://www.youtube.com/@gizligaraj",
   },
@@ -19,6 +21,7 @@ const SITE_DATA = {
     { value: "17.5M+", label: "Son 30 Günlük Erişim", icon: Users },
     { value: "%100", label: "Organik Büyüme", icon: TrendingUp },
   ],
+  // VIRAL VIDEOLAR (Instagram)
   portfolio: [
     {
       id: 1,
@@ -126,8 +129,91 @@ const VideoCard = ({ title, views, link, thumbnail, tags }: { title: string; vie
 };
 
 export default function Home() {
+  const [copied, setCopied] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Mail Kopyalama Fonksiyonu
+  const handleCopyMail = () => {
+    navigator.clipboard.writeText(SITE_DATA.contact.email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 3000);
+  };
+
   return (
     <main className="min-h-screen bg-garage-black text-white font-inter overflow-x-hidden selection:bg-garage-yellow selection:text-black">
+
+      {/* --- PREMIUM CONTACT MODAL (POPUP) --- */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <>
+            {/* Backdrop Blur */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsModalOpen(false)}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90]"
+            />
+
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none"
+            >
+              <div className="bg-[#111] border border-white/10 w-full max-w-md p-8 rounded-2xl shadow-2xl relative pointer-events-auto">
+                {/* Close Button */}
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+
+                <h3 className="text-2xl font-oswald font-bold text-white mb-2 uppercase text-center">İletişime Geç</h3>
+                <p className="text-gray-400 text-center text-sm mb-8">Markanızı tanıtmak için en uygun yöntemi seçin.</p>
+
+                <div className="space-y-4">
+                  {/* WhatsApp Option */}
+                  <a
+                    href={`https://wa.me/${SITE_DATA.contact.phone}?text=${encodeURIComponent(SITE_DATA.contact.whatsappMessage)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 w-full p-4 rounded-xl bg-[#25D366] text-black font-bold hover:brightness-110 transition-all active:scale-95 shadow-lg group"
+                  >
+                    <div className="bg-white/20 p-2 rounded-full">
+                      <MessageCircle className="w-6 h-6 text-black" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-sm opacity-80 uppercase tracking-wider">Hızlı Yanıt</div>
+                      <div className="text-lg">WhatsApp'tan Yaz</div>
+                    </div>
+                    <ArrowRight className="ml-auto w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </a>
+
+                  {/* Mail Option */}
+                  <button
+                    onClick={handleCopyMail}
+                    className="flex items-center gap-4 w-full p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all active:scale-95 group"
+                  >
+                    <div className="bg-garage-yellow/10 p-2 rounded-full">
+                      <Mail className="w-6 h-6 text-garage-yellow" />
+                    </div>
+                    <div className="text-left">
+                      <div className="text-sm text-gray-400 uppercase tracking-wider">Kurumsal</div>
+                      <div className="text-lg text-white font-bold">
+                        {copied ? "Mail Kopyalandı! ✅" : "Mail Adresini Kopyala"}
+                      </div>
+                    </div>
+                    {copied ? <Check className="ml-auto w-5 h-5 text-green-500" /> : <Copy className="ml-auto w-5 h-5 text-gray-500 group-hover:text-white" />}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* --- HERO SECTION --- */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -157,13 +243,14 @@ export default function Home() {
               Otomobil Dünyasının <span className="text-white font-semibold">Suç Dosyaları</span> <br /> & Viral İçerik Stüdyosu.
             </p>
 
-            <a
-              href={`mailto:${SITE_DATA.contact.email}?subject=${encodeURIComponent(SITE_DATA.contact.emailSubject)}`}
+            {/* YENİ MODAL TETİKLEYİCİ BUTON */}
+            <button
+              onClick={() => setIsModalOpen(true)}
               className="relative z-50 inline-flex items-center gap-3 bg-garage-yellow text-black font-bold py-4 px-8 md:px-10 rounded-sm text-lg uppercase tracking-widest hover:bg-white hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.3)] cursor-pointer"
             >
               İşbirliği Başlat
               <ArrowRight className="w-5 h-5" />
-            </a>
+            </button>
           </motion.div>
         </div>
 
@@ -245,79 +332,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- AUDIENCE --- */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="absolute right-0 top-1/4 w-1/2 h-1/2 bg-garage-yellow/5 blur-[120px] rounded-full" />
-
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-8 md:p-16">
-            <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center">
-              <div>
-                <SectionHeading subtitle="HEDEF KİTLE">KİM BİZİ İZLİYOR?</SectionHeading>
-                <div className="space-y-8 mt-10">
-                  <div>
-                    <div className="flex justify-between text-base font-bold uppercase tracking-widest mb-3">
-                      <span>Erkek</span>
-                      <span className="text-garage-yellow">92%</span>
-                    </div>
-                    <div className="h-3 bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: "92%" }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1.5, ease: "circOut" }}
-                        className="h-full bg-garage-yellow"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-base font-bold uppercase tracking-widest mb-3">
-                      <span>Yaş 18-34</span>
-                      <span className="text-garage-yellow">85%</span>
-                    </div>
-                    <div className="h-3 bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: "85%" }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1.5, ease: "circOut", delay: 0.2 }}
-                        className="h-full bg-white"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                {['Mühendislik', 'Modifiye', 'Teknoloji', 'Motorsporları', 'Restorasyon', 'Sokak Kültürü'].map((item, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="flex items-center justify-center p-6 border border-white/10 rounded-lg bg-black/40 hover:bg-garage-yellow hover:border-garage-yellow hover:text-black transition-all duration-300 cursor-default group"
-                  >
-                    <span className="font-bold uppercase tracking-wider text-xs md:text-sm text-center">{item}</span>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* --- FOOTER --- */}
       <footer className="py-24 bg-black border-t border-white/10">
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-5xl font-bold font-oswald text-white mb-10">BİRLİKTE TARİH YAZALIM</h2>
 
-          <a href={`mailto:${SITE_DATA.contact.email}`} className="group relative inline-block mb-16 z-50">
+          <button onClick={() => setIsModalOpen(true)} className="group relative inline-block mb-16 z-50">
             <span className="text-3xl md:text-6xl font-bold text-garage-yellow group-hover:text-white transition-colors">
               {SITE_DATA.contact.email}
             </span>
             <span className="absolute -bottom-2 left-0 w-full h-1 bg-garage-yellow origin-left transform scale-x-100 group-hover:scale-x-0 transition-transform duration-300"></span>
-          </a>
+          </button>
 
           <div className="flex justify-center gap-8 mb-12 relative z-50">
             <a href={SITE_DATA.contact.instagram} target="_blank" rel="noopener noreferrer" className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
@@ -326,9 +351,9 @@ export default function Home() {
             <a href={SITE_DATA.contact.youtube} target="_blank" rel="noopener noreferrer" className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
               <Youtube className="w-6 h-6" />
             </a>
-            <a href={`mailto:${SITE_DATA.contact.email}`} className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
+            <button onClick={() => setIsModalOpen(true)} className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
               <Mail className="w-6 h-6" />
-            </a>
+            </button>
           </div>
 
           <div className="text-gray-600 text-xs md:text-sm uppercase tracking-[0.2em]">
