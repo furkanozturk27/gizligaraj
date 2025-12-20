@@ -26,9 +26,9 @@ const SITE_DATA = {
     {
       id: 1,
       title: "LASTİK PATLAMASI",
-      views: "3.1M",
+      views: "3.2M",
       // 👇 Videonun Instagram Linki
-      link: "https://www.instagram.com/gizligaraj/",
+      link: "https://www.instagram.com/reel/DSKBtpQiGDr/",
       // 👇 Kapak Görseli (Değiştirebilirsin)
       thumbnail: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=800&auto=format&fit=crop",
       tags: ["Viral", "Reels"]
@@ -37,15 +37,15 @@ const SITE_DATA = {
       id: 2,
       title: "ŞANZIMAN HATASI",
       views: "1.7M",
-      link: "https://www.instagram.com/gizligaraj/",
+      link: "https://www.instagram.com/reel/DSTHiwdCNQd/",
       thumbnail: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?q=80&w=800&auto=format&fit=crop",
       tags: ["Mekanik", "Fail"]
     },
     {
       id: 3,
-      title: "FERRARİ VAKASI",
+      title: "BENZİN POMPASI",
       views: "1.6M",
-      link: "https://www.instagram.com/gizligaraj/",
+      link: "https://www.instagram.com/reel/DSZ7QKqjTkt/",
       thumbnail: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?q=80&w=800&auto=format&fit=crop",
       tags: ["Lüks", "Kaza"]
     },
