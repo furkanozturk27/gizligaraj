@@ -5,14 +5,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Play, TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X } from "lucide-react";
 
 // ==========================================
-// 🎛️ AYARLAR VE VERİ YÖNETİM PANELİ (GÜNCELLE)
+// 🎛️ AYARLAR VE VERİ YÖNETİM PANELİ
 // ==========================================
 const SITE_DATA = {
   contact: {
     email: "infogizligaraj@gmail.com",
-    // 👇 WHATSAPP NUMARANI BURAYA YAZ (Başında +90 olmadan, örn: 905551234567)
-    phone: "905555555555",
-    whatsappMessage: "Merhaba, Gizli Garaj ile işbirliği yapmak istiyoruz.", // Otomatik ilk mesaj
+    // ✅ NUMARAN ENTEGRE EDİLDİ (Uluslararası Format)
+    phone: "905514518662",
+    whatsappMessage: "Merhaba, Gizli Garaj ile işbirliği yapmak istiyoruz.", // İlk açılış mesajı
     instagram: "https://www.instagram.com/gizligaraj",
     youtube: "https://www.youtube.com/@gizligaraj",
   },
@@ -22,6 +22,7 @@ const SITE_DATA = {
     { value: "%100", label: "Organik Büyüme", icon: TrendingUp },
   ],
   // VIRAL VIDEOLAR (Instagram)
+  // Not: Linkleri ve Thumbnailleri buradan güncelleyebilirsin.
   portfolio: [
     {
       id: 1,
