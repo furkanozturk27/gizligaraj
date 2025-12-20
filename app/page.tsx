@@ -37,22 +37,22 @@ const SITE_DATA = {
     {
       id: 1,
       title: "LASTİK PATLAMASI",
-      views: "3.1M",
-      videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // ÖRNEK: Buraya kendi videonun linkini yapıştır
+      views: "3.2M",
+      videoUrl: "https://www.instagram.com/reel/DSKBtpQiGDr/", // ÖRNEK: Buraya kendi videonun linkini yapıştır
       tags: ["Viral", "Shorts"]
     },
     {
       id: 2,
       title: "ŞANZIMAN HATASI",
       views: "1.7M",
-      videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // ÖRNEK: Linki değiştir
+      videoUrl: "https://www.instagram.com/reel/DSTHiwdCNQd/", // ÖRNEK: Linki değiştir
       tags: ["Mekanik", "Fail"]
     },
     {
       id: 3,
-      title: "FERRARİ VAKASI",
-      views: "1.6M",
-      videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", // ÖRNEK: Linki değiştir
+      title: "BENZİN IŞIĞI",
+      views: "1.8M",
+      videoUrl: "", // ÖRNEK: Linki değiştir
       tags: ["Lüks", "Kaza"]
     },
   ]
