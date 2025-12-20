@@ -1,65 +1,307 @@
-import Image from "next/image";
+"use client";
+
+import React from "react";
+import { motion } from "framer-motion";
+import { Play, TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail } from "lucide-react";
+
+// --- COMPONENTS ---
+
+// 1. Bölüm Başlıkları
+const SectionHeading = ({ children, subtitle }: { children: React.ReactNode; subtitle?: string }) => (
+  <div className="mb-12 md:mb-16">
+    {subtitle && (
+      <motion.span
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }}
+        className="inline-block py-1 px-3 mb-4 text-xs font-bold tracking-[0.2em] text-garage-black bg-garage-yellow uppercase rounded-sm"
+      >
+        {subtitle}
+      </motion.span>
+    )}
+    <motion.h2
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: 0.1 }}
+      className="text-4xl md:text-6xl font-bold font-oswald text-white uppercase tracking-tight leading-none"
+    >
+      {children}
+    </motion.h2>
+    <motion.div
+      initial={{ width: 0 }}
+      whileInView={{ width: 100 }}
+      viewport={{ once: true }}
+      transition={{ delay: 0.3, duration: 0.8 }}
+      className="h-1 bg-garage-yellow mt-6"
+    />
+  </div>
+);
+
+// 2. İstatistik Kartı (Bento Style)
+const StatCard = ({ value, label, icon: Icon, delay }: { value: string; label: string; icon: any; delay: number }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5, delay }}
+    className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm p-8 hover:border-garage-yellow/50 transition-colors duration-500"
+  >
+    <div className="absolute top-0 right-0 -mt-6 -mr-6 h-32 w-32 rounded-full bg-garage-yellow/5 blur-2xl group-hover:bg-garage-yellow/10 transition-all duration-500" />
+    <Icon className="w-8 h-8 text-garage-yellow mb-4 opacity-80" />
+    <h3 className="text-5xl md:text-6xl font-bold text-white font-oswald tracking-tighter">{value}</h3>
+    <p className="text-garage-gray mt-2 text-sm uppercase tracking-wider font-medium">{label}</p>
+  </motion.div>
+);
+
+// 3. Video Placeholder
+const VideoCard = ({ title, views, imageIdx }: { title: string; views: string; imageIdx: number }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.95 }}
+    whileInView={{ opacity: 1, scale: 1 }}
+    viewport={{ once: true }}
+    whileHover={{ y: -10 }}
+    className="relative group aspect-[9/16] bg-neutral-900 rounded-xl overflow-hidden border border-white/10 cursor-pointer shadow-2xl"
+  >
+    {/* Background Image Mockup */}
+    <div
+      className="absolute inset-0 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-110 opacity-60"
+      style={{ backgroundImage: `url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3')` }}
+    />
+    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90" />
+
+    {/* Play Button */}
+    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <div className="w-16 h-16 rounded-full bg-garage-yellow flex items-center justify-center shadow-[0_0_30px_rgba(255,215,0,0.5)]">
+        <Play className="w-6 h-6 text-black fill-black ml-1" />
+      </div>
+    </div>
+
+    {/* Content */}
+    <div className="absolute bottom-0 left-0 w-full p-6">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide">Viral</span>
+        <span className="bg-white text-black text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide">Shorts</span>
+      </div>
+      <h4 className="text-xl md:text-2xl font-bold text-white font-oswald leading-none mb-2 uppercase">{title}</h4>
+      <p className="text-garage-yellow text-sm font-bold flex items-center gap-2">
+        <TrendingUp className="w-4 h-4" /> {views} Görüntülenme
+      </p>
+    </div>
+  </motion.div>
+);
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-garage-black text-white font-inter overflow-x-hidden">
+
+      {/* --- HERO SECTION --- */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Image & Overlay */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-t from-garage-black via-garage-black/80 to-transparent z-10" />
+          <div className="absolute inset-0 bg-black/60 z-[5]" />
+          <img
+            src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=2560&auto=format&fit=crop"
+            alt="Garage Atmosphere"
+            className="w-full h-full object-cover opacity-50"
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        <div className="relative z-20 container mx-auto px-6 pt-20">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="max-w-4xl"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <h1 className="text-[13vw] md:text-[8vw] leading-[0.85] font-bold font-oswald text-transparent bg-clip-text bg-gradient-to-b from-white to-neutral-600 tracking-tighter mb-6">
+              GİZLİ <span className="text-garage-yellow">GARAJ</span>
+            </h1>
+
+            <p className="text-xl md:text-3xl text-gray-300 font-light tracking-wide max-w-2xl border-l-4 border-garage-yellow pl-6 mb-10">
+              Otomobil Dünyasının <span className="text-white font-semibold">Suç Dosyaları</span> <br /> & Viral İçerik Stüdyosu.
+            </p>
+
+            <motion.a
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              href="mailto:gizligaraj.pr@gmail.com"
+              className="group inline-flex items-center gap-3 bg-garage-yellow text-black font-bold py-4 px-8 md:px-10 rounded-sm text-lg uppercase tracking-widest hover:bg-white transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.2)]"
+            >
+              İşbirliği Başlat
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </motion.a>
+          </motion.div>
         </div>
-      </main>
-    </div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, y: [0, 10, 0] }}
+          transition={{ delay: 1, duration: 2, repeat: Infinity }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-gray-500 flex flex-col items-center gap-2"
+        >
+          <span className="text-[10px] uppercase tracking-[0.3em]">Keşfet</span>
+          <div className="w-[1px] h-12 bg-gradient-to-b from-garage-yellow to-transparent" />
+        </motion.div>
+      </section>
+
+      {/* --- MISSION / ABOUT --- */}
+      <section className="py-24 md:py-32 relative">
+        <div className="container mx-auto px-6 grid md:grid-cols-2 gap-16 md:gap-24 items-center">
+          <div className="relative order-2 md:order-1">
+            <div className="absolute -inset-4 bg-garage-yellow blur-[100px] opacity-10" />
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="aspect-square rounded-2xl border border-white/10 bg-neutral-900/50 flex items-center justify-center relative overflow-hidden group"
+            >
+              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=1000')] bg-cover opacity-40 mix-blend-luminosity transition-opacity duration-700 group-hover:opacity-60"></div>
+              <div className="relative z-10 border border-white/30 p-8 backdrop-blur-md bg-black/30">
+                <span className="text-6xl font-oswald font-bold text-white tracking-tighter">GG</span>
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="order-1 md:order-2">
+            <SectionHeading subtitle="MİSYON">GİZEMİN PEŞİNDE</SectionHeading>
+            <p className="text-lg md:text-xl text-garage-gray leading-relaxed mb-6 font-light">
+              Biz sadece araba incelemiyoruz; otomobil tarihinin <strong className="text-white">saklı hikayelerini</strong>, mühendislik facialarını ve şehir efsanelerini bir <em className="text-garage-yellow not-italic">"Belgesel"</em> formatında anlatıyoruz.
+            </p>
+            <div className="pl-6 border-l border-white/20">
+              <p className="text-lg text-white leading-relaxed font-light italic">
+                "İzleyicilerimiz videoyu atlamaz, sonuna kadar nefessiz izler. Yüzümüz yok, kahraman biz değiliz; <strong className="text-garage-yellow">kahraman sizin markanız.</strong>"
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- STATS SECTION --- */}
+      <section className="py-24 bg-[#080808] relative border-y border-white/5">
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl mb-16">
+            <SectionHeading subtitle="GÜÇ">RAKAMLARLA BİZ</SectionHeading>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <StatCard icon={Zap} value="3.1M+" label="Tek Video İzlenme Rekoru" delay={0.1} />
+            <StatCard icon={Users} value="5M+" label="Aylık Ortalama Erişim" delay={0.2} />
+            <StatCard icon={TrendingUp} value="%100" label="Organik Büyüme" delay={0.3} />
+          </div>
+        </div>
+      </section>
+
+      {/* --- PORTFOLIO --- */}
+      <section className="py-24 md:py-32">
+        <div className="container mx-auto px-6">
+          <SectionHeading subtitle="KANIT">VİRAL İÇERİKLER</SectionHeading>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
+            <VideoCard title="LASTİK PATLAMASI" views="3.1M" imageIdx={1} />
+            <VideoCard title="ŞANZIMAN HATASI" views="1.7M" imageIdx={2} />
+            <VideoCard title="FERRARİ VAKASI" views="1.6M" imageIdx={3} />
+          </div>
+        </div>
+      </section>
+
+      {/* --- AUDIENCE --- */}
+      <section className="py-24 relative overflow-hidden">
+        {/* Abstract Background Element */}
+        <div className="absolute right-0 top-1/4 w-1/2 h-1/2 bg-garage-yellow/5 blur-[120px] rounded-full" />
+
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-8 md:p-16">
+            <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center">
+              <div>
+                <SectionHeading subtitle="HEDEF KİTLE">KİM BİZİ İZLİYOR?</SectionHeading>
+                <div className="space-y-8 mt-10">
+                  {/* Progress Bar 1 */}
+                  <div>
+                    <div className="flex justify-between text-base font-bold uppercase tracking-widest mb-3">
+                      <span>Erkek</span>
+                      <span className="text-garage-yellow">92%</span>
+                    </div>
+                    <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: "92%" }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.5, ease: "circOut" }}
+                        className="h-full bg-garage-yellow"
+                      />
+                    </div>
+                  </div>
+                  {/* Progress Bar 2 */}
+                  <div>
+                    <div className="flex justify-between text-base font-bold uppercase tracking-widest mb-3">
+                      <span>Yaş 18-34</span>
+                      <span className="text-garage-yellow">85%</span>
+                    </div>
+                    <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: "85%" }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.5, ease: "circOut", delay: 0.2 }}
+                        className="h-full bg-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Interest Tags */}
+              <div className="grid grid-cols-2 gap-4">
+                {['Mühendislik', 'Modifiye', 'Teknoloji', 'Motorsporları', 'Restorasyon', 'Sokak Kültürü'].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex items-center justify-center p-6 border border-white/10 rounded-lg bg-black/40 hover:bg-garage-yellow hover:border-garage-yellow hover:text-black transition-all duration-300 cursor-default group"
+                  >
+                    <span className="font-bold uppercase tracking-wider text-xs md:text-sm text-center">{item}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- FOOTER --- */}
+      <footer className="py-24 bg-black border-t border-white/10">
+        <div className="container mx-auto px-6 text-center">
+          <h2 className="text-3xl md:text-5xl font-bold font-oswald text-white mb-10">BİRLİKTE TARİH YAZALIM</h2>
+
+          <a href="mailto:gizligaraj.pr@gmail.com" className="group relative inline-block mb-16">
+            <span className="text-3xl md:text-6xl font-bold text-garage-yellow group-hover:text-white transition-colors">
+              gizligaraj.pr@gmail.com
+            </span>
+            <span className="absolute -bottom-2 left-0 w-full h-1 bg-garage-yellow origin-left transform scale-x-100 group-hover:scale-x-0 transition-transform duration-300"></span>
+          </a>
+
+          <div className="flex justify-center gap-8 mb-12">
+            <a href="#" className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
+              <Instagram className="w-6 h-6" />
+            </a>
+            <a href="#" className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
+              <Youtube className="w-6 h-6" />
+            </a>
+            <a href="mailto:gizligaraj.pr@gmail.com" className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
+              <Mail className="w-6 h-6" />
+            </a>
+          </div>
+
+          <div className="text-gray-600 text-xs md:text-sm uppercase tracking-[0.2em]">
+            © 2025 Gizli Garaj Media. All Rights Reserved.
+          </div>
+        </div>
+      </footer>
+    </main>
   );
 }
