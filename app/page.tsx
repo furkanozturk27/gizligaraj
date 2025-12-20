@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView, useSpring, useMotionValue, useTransform } from "framer-motion";
-import { TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X, Film, Target } from "lucide-react";
+import { TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X, Film, Target, MonitorPlay, Package, Megaphone } from "lucide-react";
 
 // ==========================================
 // 🎛️ AYARLAR VE VERİ YÖNETİM PANELİ
@@ -32,7 +32,24 @@ const SITE_DATA = {
       icon: Target
     }
   ],
-  // ⚡ DİKKAT: Rakamları ve harfleri ayırdık (Animasyon için gerekli)
+  // ⚡ YENİ EKLENEN BÖLÜM: HİZMETLER
+  services: [
+    {
+      title: "VIRAL REELS ENTEGRASYONU",
+      desc: "Markanızın ürünü veya hizmeti, milyonlarca izlenen Reels akışımızın içine 'doğal kurgu' ile yerleştirilir. Reklam gibi durmaz, içerik gibi akar.",
+      icon: MonitorPlay
+    },
+    {
+      title: "ÜRÜN DENEYİMİ & İNCELEME",
+      desc: "Ürününüzü garajımızda gerçek koşullarda test ediyoruz. 'Unboxing'den montaja kadar tüm süreci sinematik bir dille anlatıyoruz.",
+      icon: Package
+    },
+    {
+      title: "PROJE SPONSORLUĞU",
+      desc: "Uzun soluklu projelerimizin (Örn: Motor yenileme, Proje araba yapımı) ana sponsoru olun. Tüm seride logonuz ve markanız yer alsın.",
+      icon: Megaphone
+    }
+  ],
   stats: [
     { number: 3.1, suffix: "M+", label: "Tek Video İzlenme Rekoru", icon: Zap },
     { number: 17.5, suffix: "M+", label: "Son 30 Günlük Erişim", icon: Users },
@@ -100,7 +117,23 @@ const FeatureCard = ({ title, desc, icon: Icon, delay }: { title: string; desc: 
   </motion.div>
 );
 
-// ⚡ YENİ: SAYIM YAPAN RAKAM BİLEŞENİ
+// YENİ: HİZMET KARTI (SERVICE CARD)
+const ServiceCard = ({ title, desc, icon: Icon, delay }: { title: string; desc: string; icon: any; delay: number }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5, delay }}
+    className="bg-[#111] border border-white/10 p-8 rounded-xl hover:border-garage-yellow/50 transition-all duration-300 group hover:-translate-y-2 shadow-lg"
+  >
+    <div className="w-14 h-14 bg-garage-yellow/10 rounded-full flex items-center justify-center mb-6 group-hover:bg-garage-yellow transition-colors duration-300">
+      <Icon className="w-7 h-7 text-garage-yellow group-hover:text-black transition-colors duration-300" />
+    </div>
+    <h3 className="text-xl font-bold font-oswald text-white mb-3 uppercase tracking-wide">{title}</h3>
+    <p className="text-gray-400 text-sm leading-relaxed">{desc}</p>
+  </motion.div>
+);
+
 const AnimatedNumber = ({ value, suffix }: { value: number, suffix: string }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -116,9 +149,9 @@ const AnimatedNumber = ({ value, suffix }: { value: number, suffix: string }) =>
 
   const displayValue = useTransform(springValue, (latest) => {
     if (Number.isInteger(value)) {
-      return Math.round(latest).toString(); // Tam sayıysa virgül koyma
+      return Math.round(latest).toString();
     }
-    return latest.toFixed(1); // Ondalıklıysa 1 basamak göster (örn: 17.5)
+    return latest.toFixed(1);
   });
 
   return (
@@ -352,7 +385,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- FEATURES --- */}
+      {/* --- FEATURES / WHY US? --- */}
       <section className="py-24 bg-[#080808] border-t border-white/5">
         <div className="container mx-auto px-6">
           <SectionHeading subtitle="FARKLILIK">NEDEN GİZLİ GARAJ?</SectionHeading>
@@ -360,6 +393,19 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             {SITE_DATA.features.map((feature, i) => (
               <FeatureCard key={i} title={feature.title} desc={feature.desc} icon={feature.icon} delay={0.2 * i} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* --- YENİ EKLENEN BÖLÜM: SERVICES / HİZMETLER --- */}
+      <section className="py-24 bg-gradient-to-b from-[#080808] to-[#111] border-t border-white/5">
+        <div className="container mx-auto px-6">
+          <SectionHeading subtitle="İŞ MODELLERİ">HİZMETLERİMİZ</SectionHeading>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {SITE_DATA.services.map((service, i) => (
+              <ServiceCard key={i} title={service.title} desc={service.desc} icon={service.icon} delay={0.2 * i} />
             ))}
           </div>
         </div>
