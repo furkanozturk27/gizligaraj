@@ -1,8 +1,98 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useId } from "react";
 import { motion, AnimatePresence, useInView, useSpring, useMotionValue, useTransform, useScroll } from "framer-motion";
 import { TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X, Film, Target, MonitorPlay, Package, Megaphone, ChevronDown, MapPin, BarChart3, Activity } from "lucide-react";
+import { cn } from "@/lib/utils"; // Az önce oluşturduğun dosya
+
+// ==========================================
+// ✨ SPARKLES (KIVILCIM) MOTORU
+// ==========================================
+const SparklesCore = (props: {
+  id?: string;
+  className?: string;
+  background?: string;
+  minSize?: number;
+  maxSize?: number;
+  particleDensity?: number;
+  particleColor?: string;
+  speed?: number;
+}) => {
+  const {
+    id,
+    className,
+    background = "transparent",
+    minSize = 0.6,
+    maxSize = 1.4,
+    particleDensity = 100,
+    particleColor = "#FFD700", // GARAJ SARISI
+    speed = 1,
+  } = props;
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasId = useId();
+  const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      const ctx = canvasRef.current.getContext("2d");
+      setContext(ctx);
+    }
+  }, []);
+
+  useEffect(() => {
+    let animationFrameId: number;
+    if (context && canvasRef.current) {
+      const particles: any[] = [];
+      const { width, height } = canvasRef.current;
+
+      for (let i = 0; i < particleDensity; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          size: Math.random() * (maxSize - minSize) + minSize,
+          speedX: (Math.random() - 0.5) * speed,
+          speedY: (Math.random() - 0.5) * speed,
+        });
+      }
+
+      const draw = () => {
+        if (!context || !canvasRef.current) return;
+        context.clearRect(0, 0, width, height);
+        context.fillStyle = particleColor;
+
+        particles.forEach((p) => {
+          p.x += p.speedX;
+          p.y += p.speedY;
+
+          if (p.x < 0) p.x = width;
+          if (p.x > width) p.x = 0;
+          if (p.y < 0) p.y = height;
+          if (p.y > height) p.y = 0;
+
+          context.beginPath();
+          context.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          context.fill();
+        });
+
+        animationFrameId = requestAnimationFrame(draw);
+      };
+      draw();
+    }
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [context, maxSize, minSize, particleColor, particleDensity, speed]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      id={id || canvasId}
+      className={cn("absolute inset-0 h-full w-full pointer-events-none", className)}
+      style={{ background }}
+      width={1200} // Varsayılan, resize ile güncellenecek
+      height={800}
+    />
+  );
+};
+
 
 // ==========================================
 // 🎛️ AYARLAR VE VERİ YÖNETİM PANELİ
@@ -15,13 +105,12 @@ const SITE_DATA = {
     instagram: "https://www.instagram.com/gizligaraj",
     youtube: "https://www.youtube.com/@gizligaraj",
   },
-  // İNSTAGRAM VERİLERİ (Ekran Görüntüsünden)
   audience: {
     cities: [
-      { name: "İstanbul", value: 42, color: "#FFD700" }, // Sarı
-      { name: "Ankara", value: 20, color: "#FFFFFF" },   // Beyaz
-      { name: "İzmir", value: 15, color: "#888888" },    // Gri
-      { name: "Diğer", value: 23, color: "#333333" },    // Koyu Gri
+      { name: "İstanbul", value: 42, color: "#FFD700" },
+      { name: "Ankara", value: 20, color: "#FFFFFF" },
+      { name: "İzmir", value: 15, color: "#888888" },
+      { name: "Diğer", value: 23, color: "#333333" },
     ],
     ages: [
       { range: "18-24", value: 45 },
@@ -67,8 +156,8 @@ const SITE_DATA = {
   ],
   stats: [
     { number: 3.1, suffix: "M+", label: "Tek Video İzlenme Rekoru", icon: Zap },
-    { number: 19.4, suffix: "M+", label: "Son 30 Günlük Erişim", icon: Users }, // Güncel veri
-    { number: 415, suffix: "K+", label: "Aylık Etkileşim", icon: Activity },    // Güncel veri
+    { number: 19.4, suffix: "M+", label: "Son 30 Günlük Erişim", icon: Users },
+    { number: 415, suffix: "K+", label: "Aylık Etkileşim", icon: Activity },
   ],
   portfolio: [
     {
@@ -116,7 +205,6 @@ const SectionHeading = ({ children, subtitle }: { children: React.ReactNode; sub
   </div>
 );
 
-// --- ÖZEL DONUT GRAFİK BİLEŞENİ (Kütüphanesiz) ---
 const DonutChart = ({ data }: { data: typeof SITE_DATA.audience.cities }) => {
   const radius = 80;
   const stroke = 20;
@@ -141,7 +229,7 @@ const DonutChart = ({ data }: { data: typeof SITE_DATA.audience.cities }) => {
               strokeWidth={stroke}
               fill="transparent"
               strokeDasharray={circumference}
-              strokeDashoffset={offset} // Başlangıçta hepsi dolu gibi görünüp animasyonla düzelmesi için
+              strokeDashoffset={offset}
               initial={{ strokeDashoffset: circumference }}
               whileInView={{ strokeDashoffset: offset }}
               viewport={{ once: true }}
@@ -151,7 +239,6 @@ const DonutChart = ({ data }: { data: typeof SITE_DATA.audience.cities }) => {
           );
         })}
       </svg>
-      {/* Ortadaki Yazı */}
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none rotate-0">
         <MapPin className="w-8 h-8 text-garage-yellow mb-1" />
         <span className="text-xs text-gray-400 uppercase tracking-widest">Lokasyon</span>
@@ -383,6 +470,17 @@ export default function Home() {
               className="w-full h-full object-cover opacity-60"
             />
           </motion.div>
+
+          {/* ✨✨✨ KIVILCIM EFEKTİ BURADA ✨✨✨ */}
+          <SparklesCore
+            id="tsparticlesfullpage"
+            background="transparent"
+            minSize={0.6}
+            maxSize={1.4}
+            particleDensity={70}
+            className="w-full h-full"
+            particleColor="#FFD700"
+          />
         </div>
         <motion.div style={{ opacity: textOpacity }} className="relative z-30 text-center px-4">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
@@ -478,7 +576,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ⭐⭐⭐ YENİ: TARGET AUDIENCE (HEDEF KİTLE) - DATA DASHBOARD ⭐⭐⭐ */}
+        {/* HEDEF KİTLE ANALİZİ */}
         <section className="py-24 relative overflow-hidden bg-[#0a0a0a]">
           <div className="absolute right-0 top-1/4 w-1/2 h-1/2 bg-garage-yellow/5 blur-[120px] rounded-full" />
 
@@ -487,7 +585,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-              {/* 1. KUTU: CİNSİYET (BAR CHART) */}
+              {/* 1. KUTU: CİNSİYET */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -498,7 +596,6 @@ export default function Home() {
                   <Users className="w-6 h-6 text-garage-yellow" />
                   <h3 className="text-xl font-oswald text-white uppercase tracking-wide">Cinsiyet Dağılımı</h3>
                 </div>
-
                 <div className="space-y-8">
                   <div>
                     <div className="flex justify-between text-sm font-bold uppercase tracking-widest mb-2">
@@ -506,13 +603,7 @@ export default function Home() {
                       <span className="text-garage-yellow">{SITE_DATA.audience.gender.male}%</span>
                     </div>
                     <div className="h-4 bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${SITE_DATA.audience.gender.male}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1.5, ease: "circOut" }}
-                        className="h-full bg-garage-yellow"
-                      />
+                      <motion.div initial={{ width: 0 }} whileInView={{ width: `${SITE_DATA.audience.gender.male}%` }} viewport={{ once: true }} transition={{ duration: 1.5, ease: "circOut" }} className="h-full bg-garage-yellow" />
                     </div>
                   </div>
                   <div>
@@ -521,19 +612,13 @@ export default function Home() {
                       <span className="text-white">{SITE_DATA.audience.gender.female}%</span>
                     </div>
                     <div className="h-4 bg-white/10 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${SITE_DATA.audience.gender.female}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1.5, ease: "circOut", delay: 0.2 }}
-                        className="h-full bg-white"
-                      />
+                      <motion.div initial={{ width: 0 }} whileInView={{ width: `${SITE_DATA.audience.gender.female}%` }} viewport={{ once: true }} transition={{ duration: 1.5, ease: "circOut", delay: 0.2 }} className="h-full bg-white" />
                     </div>
                   </div>
                 </div>
               </motion.div>
 
-              {/* 2. KUTU: ŞEHİRLER (DONUT CHART) */}
+              {/* 2. KUTU: ŞEHİRLER */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -545,9 +630,7 @@ export default function Home() {
                   <MapPin className="w-6 h-6 text-garage-yellow" />
                   <h3 className="text-xl font-oswald text-white uppercase tracking-wide">Lokasyon</h3>
                 </div>
-
                 <DonutChart data={SITE_DATA.audience.cities} />
-
                 <div className="grid grid-cols-2 gap-x-8 gap-y-3 mt-6 w-full">
                   {SITE_DATA.audience.cities.map((city, i) => (
                     <div key={i} className="flex items-center justify-between text-sm">
@@ -561,7 +644,7 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              {/* 3. KUTU: YAŞ DAĞILIMI (VERTICAL BARS) */}
+              {/* 3. KUTU: YAŞ DAĞILIMI */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -573,26 +656,18 @@ export default function Home() {
                   <BarChart3 className="w-6 h-6 text-garage-yellow" />
                   <h3 className="text-xl font-oswald text-white uppercase tracking-wide">Yaş Aralığı</h3>
                 </div>
-
                 <div className="flex items-end justify-between h-48 gap-4">
                   {SITE_DATA.audience.ages.map((age, i) => (
                     <div key={i} className="flex flex-col items-center gap-2 flex-1 group">
                       <span className="text-garage-yellow font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity">%{age.value}</span>
                       <div className="w-full bg-white/10 rounded-t-lg relative overflow-hidden flex-1 flex items-end">
-                        <motion.div
-                          initial={{ height: 0 }}
-                          whileInView={{ height: `${age.value * 2}%` }} // Görsel olarak ölçekledik
-                          viewport={{ once: true }}
-                          transition={{ duration: 1, delay: i * 0.1 }}
-                          className={`w-full ${i === 0 ? 'bg-white' : i === 1 ? 'bg-garage-yellow' : 'bg-gray-600'}`}
-                        />
+                        <motion.div initial={{ height: 0 }} whileInView={{ height: `${age.value * 2}%` }} viewport={{ once: true }} transition={{ duration: 1, delay: i * 0.1 }} className={`w-full ${i === 0 ? 'bg-white' : i === 1 ? 'bg-garage-yellow' : 'bg-gray-600'}`} />
                       </div>
                       <span className="text-xs font-bold text-gray-400">{age.range}</span>
                     </div>
                   ))}
                 </div>
               </motion.div>
-
             </div>
           </div>
         </section>
