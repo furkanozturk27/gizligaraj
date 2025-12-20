@@ -2,34 +2,29 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Play, TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, ExternalLink } from "lucide-react";
+import { Play, TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail } from "lucide-react";
 
 // ==========================================
-// 🎛️ AYARLAR VE VERİ YÖNETİM PANELİ (BURAYI DÜZENLE)
+// 🎛️ AYARLAR (Kullanıcı Verileri Korundu)
 // ==========================================
 const SITE_DATA = {
-  // İletişim Bilgileri
   contact: {
     email: "infogizligaraj@gmail.com",
+    emailSubject: "Gizli Garaj İşbirliği Talebi",
     instagram: "https://www.instagram.com/gizligaraj",
     youtube: "https://www.youtube.com/@gizligaraj",
   },
-  // İstatistikler
   stats: [
     { value: "3.1M+", label: "Tek Video İzlenme Rekoru", icon: Zap },
     { value: "17.5M+", label: "Son 30 Günlük Erişim", icon: Users },
     { value: "%100", label: "Organik Büyüme", icon: TrendingUp },
   ],
-  // Viral Videolar Listesi (INSTAGRAM REELS UYUMLU)
-  // Not: Instagram otomatik kapak vermez. 'thumbnail' kısmına görsel linki koymalısın.
   portfolio: [
     {
       id: 1,
       title: "LASTİK PATLAMASI",
       views: "3.2M",
-      // 👇 Videonun Instagram Linki
       link: "https://www.instagram.com/reel/DSKBtpQiGDr/",
-      // 👇 Kapak Görseli (Değiştirebilirsin)
       thumbnail: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=800&auto=format&fit=crop",
       tags: ["Viral", "Reels"]
     },
@@ -44,7 +39,7 @@ const SITE_DATA = {
     {
       id: 3,
       title: "BENZİN POMPASI",
-      views: "1.6M",
+      views: "1.8M",
       link: "https://www.instagram.com/reel/DSZ7QKqjTkt/",
       thumbnail: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?q=80&w=800&auto=format&fit=crop",
       tags: ["Lüks", "Kaza"]
@@ -97,26 +92,22 @@ const VideoCard = ({ title, views, link, thumbnail, tags }: { title: string; vie
       whileHover={{ y: -10 }}
       className="relative group aspect-[9/16] bg-neutral-900 rounded-xl overflow-hidden border border-white/10 cursor-pointer shadow-2xl block z-10"
     >
-      {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-110 opacity-60"
         style={{ backgroundImage: `url('${thumbnail}')` }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90" />
 
-      {/* Play/Instagram Button Overlay */}
       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div className="w-16 h-16 rounded-full bg-garage-yellow flex items-center justify-center shadow-[0_0_30px_rgba(255,215,0,0.5)]">
           <Instagram className="w-8 h-8 text-black" />
         </div>
       </div>
 
-      {/* Top Right Icon */}
       <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md p-2 rounded-full border border-white/10">
         <Instagram className="w-4 h-4 text-white" />
       </div>
 
-      {/* Content */}
       <div className="absolute bottom-0 left-0 w-full p-6">
         <div className="flex items-center gap-2 mb-3">
           {tags.map((tag, i) => (
@@ -140,7 +131,8 @@ export default function Home() {
 
       {/* --- HERO SECTION --- */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0 pointer-events-none">
+
+        <div className="absolute inset-0 z-0 pointer-events-none select-none">
           <div className="absolute inset-0 bg-gradient-to-t from-garage-black via-garage-black/80 to-transparent z-10" />
           <div className="absolute inset-0 bg-black/60 z-[5]" />
           <img
@@ -165,13 +157,12 @@ export default function Home() {
               Otomobil Dünyasının <span className="text-white font-semibold">Suç Dosyaları</span> <br /> & Viral İçerik Stüdyosu.
             </p>
 
-            {/* FIXED BUTTON */}
             <a
-              href={`mailto:${SITE_DATA.contact.email}`}
-              className="relative z-50 group inline-flex items-center gap-3 bg-garage-yellow text-black font-bold py-4 px-8 md:px-10 rounded-sm text-lg uppercase tracking-widest hover:bg-white transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.2)] cursor-pointer"
+              href={`mailto:${SITE_DATA.contact.email}?subject=${encodeURIComponent(SITE_DATA.contact.emailSubject)}`}
+              className="relative z-50 inline-flex items-center gap-3 bg-garage-yellow text-black font-bold py-4 px-8 md:px-10 rounded-sm text-lg uppercase tracking-widest hover:bg-white hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.3)] cursor-pointer"
             >
               İşbirliği Başlat
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-5 h-5" />
             </a>
           </motion.div>
         </div>
