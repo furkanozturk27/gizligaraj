@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView, useSpring, useMotionValue, useTransform, useScroll } from "framer-motion";
-import { TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X, Film, Target, MonitorPlay, Package, Megaphone, ChevronDown } from "lucide-react";
+import { TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X, Film, Target, MonitorPlay, Package, Megaphone, ChevronDown, MapPin, BarChart3, Activity } from "lucide-react";
 
 // ==========================================
 // 🎛️ AYARLAR VE VERİ YÖNETİM PANELİ
@@ -14,6 +14,22 @@ const SITE_DATA = {
     whatsappMessage: "Merhaba, Gizli Garaj ile işbirliği yapmak istiyoruz.",
     instagram: "https://www.instagram.com/gizligaraj",
     youtube: "https://www.youtube.com/@gizligaraj",
+  },
+  // İNSTAGRAM VERİLERİ (Ekran Görüntüsünden)
+  audience: {
+    cities: [
+      { name: "İstanbul", value: 42, color: "#FFD700" }, // Sarı
+      { name: "Ankara", value: 20, color: "#FFFFFF" },   // Beyaz
+      { name: "İzmir", value: 15, color: "#888888" },    // Gri
+      { name: "Diğer", value: 23, color: "#333333" },    // Koyu Gri
+    ],
+    ages: [
+      { range: "18-24", value: 45 },
+      { range: "25-34", value: 35 },
+      { range: "35-44", value: 15 },
+      { range: "45+", value: 5 },
+    ],
+    gender: { male: 92, female: 8 }
   },
   features: [
     {
@@ -51,8 +67,8 @@ const SITE_DATA = {
   ],
   stats: [
     { number: 3.1, suffix: "M+", label: "Tek Video İzlenme Rekoru", icon: Zap },
-    { number: 17.5, suffix: "M+", label: "Son 30 Günlük Erişim", icon: Users },
-    { number: 100, suffix: "%", label: "Organik Büyüme", icon: TrendingUp },
+    { number: 19.4, suffix: "M+", label: "Son 30 Günlük Erişim", icon: Users }, // Güncel veri
+    { number: 415, suffix: "K+", label: "Aylık Etkileşim", icon: Activity },    // Güncel veri
   ],
   portfolio: [
     {
@@ -99,6 +115,50 @@ const SectionHeading = ({ children, subtitle }: { children: React.ReactNode; sub
     <div className="h-1 w-24 bg-garage-yellow mt-6" />
   </div>
 );
+
+// --- ÖZEL DONUT GRAFİK BİLEŞENİ (Kütüphanesiz) ---
+const DonutChart = ({ data }: { data: typeof SITE_DATA.audience.cities }) => {
+  const radius = 80;
+  const stroke = 20;
+  const circumference = 2 * Math.PI * radius;
+  let accumulatedPercent = 0;
+
+  return (
+    <div className="relative w-64 h-64 flex items-center justify-center">
+      <svg width="200" height="200" viewBox="0 0 200 200" className="rotate-[-90deg]">
+        {data.map((item, index) => {
+          const offset = circumference - (item.value / 100) * circumference;
+          const rotation = (accumulatedPercent / 100) * 360;
+          accumulatedPercent += item.value;
+
+          return (
+            <motion.circle
+              key={index}
+              cx="100"
+              cy="100"
+              r={radius}
+              stroke={item.color}
+              strokeWidth={stroke}
+              fill="transparent"
+              strokeDasharray={circumference}
+              strokeDashoffset={offset} // Başlangıçta hepsi dolu gibi görünüp animasyonla düzelmesi için
+              initial={{ strokeDashoffset: circumference }}
+              whileInView={{ strokeDashoffset: offset }}
+              viewport={{ once: true }}
+              transition={{ duration: 1.5, delay: index * 0.2, ease: "circOut" }}
+              style={{ transformOrigin: "center", rotate: rotation }}
+            />
+          );
+        })}
+      </svg>
+      {/* Ortadaki Yazı */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none rotate-0">
+        <MapPin className="w-8 h-8 text-garage-yellow mb-1" />
+        <span className="text-xs text-gray-400 uppercase tracking-widest">Lokasyon</span>
+      </div>
+    </div>
+  );
+};
 
 const FeatureCard = ({ title, desc, icon: Icon, delay }: { title: string; desc: string; icon: any; delay: number }) => (
   <motion.div
@@ -226,17 +286,10 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // --- GARAJ KAPISI ANİMASYON AYARLARI ---
+  // --- PARALLAX VE SCROLL ---
   const { scrollYProgress } = useScroll();
-
-  // Kapının Y pozisyonu: Scroll 0'dan 0.4'e gelirken, kapı 0%'dan -100%'e (yukarı) gider.
-  // "clamp: true" animasyonun bitince orada kalmasını sağlar.
   const doorY = useTransform(scrollYProgress, [0, 0.4], ["0%", "-100%"], { clamp: true });
-
-  // Kapıdaki yazının opaklığı: Kapı açılırken yazı yavaşça kaybolur.
   const textOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0], { clamp: true });
-
-  // Kapıdaki görselin hafif zoom efekti: Derinlik hissi için.
   const bgScale = useTransform(scrollYProgress, [0, 0.4], [1, 1.1], { clamp: true });
 
   const handleCopyMail = () => {
@@ -316,15 +369,11 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* ⭐⭐⭐ GARAJ KAPISI (HERO SECTION) ⭐⭐⭐ 
-        Bu bölüm 'fixed' olarak en üstte durur ve scroll ile yukarı kayar.
-      */}
+      {/* ⭐⭐⭐ GARAJ KAPISI (HERO) ⭐⭐⭐ */}
       <motion.section
-        style={{ y: doorY }} // Kapının yukarı hareketi
+        style={{ y: doorY }}
         className="fixed inset-0 z-50 h-screen w-full overflow-hidden bg-garage-black flex flex-col items-center justify-center shadow-2xl"
       >
-
-        {/* KAPININ ARKA PLAN GÖRSELİ (Hafif Zoom Efektli) */}
         <div className="absolute inset-0 z-0 pointer-events-none select-none">
           <div className="absolute inset-0 bg-gradient-to-t from-garage-black via-garage-black/90 to-garage-black/50 z-20" />
           <motion.div style={{ scale: bgScale }} className="absolute inset-0">
@@ -335,55 +384,28 @@ export default function Home() {
             />
           </motion.div>
         </div>
-
-        {/* KAPININ ÜZERİNDEKİ YAZI (Yukarı kalkarken silikleşir) */}
-        <motion.div
-          style={{ opacity: textOpacity }}
-          className="relative z-30 text-center px-4"
-        >
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
+        <motion.div style={{ opacity: textOpacity }} className="relative z-30 text-center px-4">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
             <h1 className="text-[15vw] md:text-[12vw] leading-[0.85] font-bold font-oswald text-white tracking-tighter mb-4 whitespace-nowrap drop-shadow-2xl">
               GİZLİ <span className="text-garage-yellow">GARAJ</span>
             </h1>
           </motion.div>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="text-xl md:text-3xl text-gray-300 font-light tracking-wide max-w-2xl mx-auto border-b-4 border-garage-yellow pb-4 md:pb-6 drop-shadow-lg"
-          >
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.5 }} className="text-xl md:text-3xl text-gray-300 font-light tracking-wide max-w-2xl mx-auto border-b-4 border-garage-yellow pb-4 md:pb-6 drop-shadow-lg">
             Otomobil Dünyasının <span className="text-white font-semibold">Suç Dosyaları</span>
           </motion.p>
-
-          {/* SCROLL İPUCU İKONU */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, y: [0, 10, 0] }}
-            transition={{ delay: 1, duration: 2, repeat: Infinity }}
-            className="absolute left-1/2 -translate-x-1/2 mt-16 md:mt-24 flex flex-col items-center text-garage-yellow/70"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1, y: [0, 10, 0] }} transition={{ delay: 1, duration: 2, repeat: Infinity }} className="absolute left-1/2 -translate-x-1/2 mt-16 md:mt-24 flex flex-col items-center text-garage-yellow/70">
             <span className="text-sm uppercase tracking-[0.3em] mb-2 font-bold">Giriş Yap</span>
             <ChevronDown className="w-8 h-8 animate-bounce" />
           </motion.div>
         </motion.div>
       </motion.section>
 
-      {/* ⭐⭐⭐ SANAL SCROLL BOŞLUĞU ⭐⭐⭐ 
-        Kapının açılması için gereken kaydırma mesafesi.
-        Bu boşluk olmazsa kapı anında yukarı fırlar.
-      */}
       <div className="h-[130vh] pointer-events-none" />
 
-      {/* ⭐⭐⭐ ANA İÇERİK (KAPININ ALTINDAN ÇIKAN KISIM) ⭐⭐⭐ 
-        Relative ve z-index ile kapının altında durur.
-      */}
+      {/* ⭐⭐⭐ ANA İÇERİK ⭐⭐⭐ */}
       <div className="relative z-40 bg-garage-black shadow-[0_-50px_100px_rgba(0,0,0,1)]">
 
-        {/* İŞBİRLİĞİ BUTONU (İlk karşılayan eleman) */}
+        {/* Buton */}
         <div className="container mx-auto px-6 py-24 relative z-50 text-center">
           <motion.button
             initial={{ opacity: 0, scale: 0.9 }}
@@ -398,43 +420,30 @@ export default function Home() {
           </motion.button>
         </div>
 
-        {/* --- MISSION / ABOUT --- */}
+        {/* MİSYON */}
         <section className="py-24 md:py-32 relative border-t border-white/5 bg-garage-black">
           <div className="container mx-auto px-6 grid md:grid-cols-2 gap-16 md:gap-24 items-center">
             <div className="relative order-2 md:order-1">
               <div className="absolute -inset-4 bg-garage-yellow blur-[100px] opacity-10" />
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                className="aspect-square rounded-2xl border border-white/10 bg-neutral-900/50 flex items-center justify-center relative overflow-hidden group"
-              >
+              <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="aspect-square rounded-2xl border border-white/10 bg-neutral-900/50 flex items-center justify-center relative overflow-hidden group">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?q=80&w=1000')] bg-cover opacity-40 mix-blend-luminosity transition-opacity duration-700 group-hover:opacity-60"></div>
                 <div className="relative z-10 border border-white/30 p-8 backdrop-blur-md bg-black/30">
                   <span className="text-6xl font-oswald font-bold text-white tracking-tighter">GG</span>
                 </div>
               </motion.div>
             </div>
-
             <div className="order-1 md:order-2">
               <SectionHeading subtitle="MİSYON">GİZEMİN PEŞİNDE</SectionHeading>
-              <p className="text-lg md:text-xl text-garage-gray leading-relaxed mb-6 font-light">
-                Biz sadece araba incelemiyoruz; otomobil tarihinin <strong className="text-white">saklı hikayelerini</strong>, mühendislik facialarını ve şehir efsanelerini bir <em className="text-garage-yellow not-italic">"Belgesel"</em> formatında anlatıyoruz.
-              </p>
-              <div className="pl-6 border-l border-white/20">
-                <p className="text-lg text-white leading-relaxed font-light italic">
-                  "İzleyicilerimiz videoyu atlamaz, sonuna kadar nefessiz izler. Yüzümüz yok, kahraman biz değiliz; <strong className="text-garage-yellow">kahraman sizin markanız.</strong>"
-                </p>
-              </div>
+              <p className="text-lg md:text-xl text-garage-gray leading-relaxed mb-6 font-light">Biz sadece araba incelemiyoruz; otomobil tarihinin <strong className="text-white">saklı hikayelerini</strong>, mühendislik facialarını ve şehir efsanelerini bir <em className="text-garage-yellow not-italic">"Belgesel"</em> formatında anlatıyoruz.</p>
+              <div className="pl-6 border-l border-white/20"><p className="text-lg text-white leading-relaxed font-light italic">"İzleyicilerimiz videoyu atlamaz, sonuna kadar nefessiz izler. Yüzümüz yok, kahraman biz değiliz; <strong className="text-garage-yellow">kahraman sizin markanız.</strong>"</p></div>
             </div>
           </div>
         </section>
 
-        {/* --- FEATURES / WHY US? --- */}
+        {/* NEDEN BİZ */}
         <section className="py-24 bg-[#080808] border-t border-white/5">
           <div className="container mx-auto px-6">
             <SectionHeading subtitle="FARKLILIK">NEDEN GİZLİ GARAJ?</SectionHeading>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               {SITE_DATA.features.map((feature, i) => (
                 <FeatureCard key={i} title={feature.title} desc={feature.desc} icon={feature.icon} delay={0.2 * i} />
@@ -443,11 +452,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* --- SERVICES --- */}
+        {/* HİZMETLER */}
         <section className="py-24 bg-gradient-to-b from-[#080808] to-[#111] border-t border-white/5">
           <div className="container mx-auto px-6">
             <SectionHeading subtitle="İŞ MODELLERİ">HİZMETLERİMİZ</SectionHeading>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {SITE_DATA.services.map((service, i) => (
                 <ServiceCard key={i} title={service.title} desc={service.desc} icon={service.icon} delay={0.2 * i} />
@@ -456,13 +464,12 @@ export default function Home() {
           </div>
         </section>
 
-        {/* --- STATS SECTION (ANIMATED) --- */}
+        {/* RAKAMLAR */}
         <section className="py-24 bg-[#080808] relative border-y border-white/5">
           <div className="container mx-auto px-6">
             <div className="max-w-4xl mb-16">
               <SectionHeading subtitle="GÜÇ">RAKAMLARLA BİZ</SectionHeading>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {SITE_DATA.stats.map((stat, index) => (
                 <StatCard key={index} icon={stat.icon} number={stat.number} suffix={stat.suffix} label={stat.label} delay={0.1 * (index + 1)} />
@@ -471,11 +478,129 @@ export default function Home() {
           </div>
         </section>
 
-        {/* --- PORTFOLIO --- */}
+        {/* ⭐⭐⭐ YENİ: TARGET AUDIENCE (HEDEF KİTLE) - DATA DASHBOARD ⭐⭐⭐ */}
+        <section className="py-24 relative overflow-hidden bg-[#0a0a0a]">
+          <div className="absolute right-0 top-1/4 w-1/2 h-1/2 bg-garage-yellow/5 blur-[120px] rounded-full" />
+
+          <div className="container mx-auto px-6 relative z-10">
+            <SectionHeading subtitle="TELEMETRİ">HEDEF KİTLE ANALİZİ</SectionHeading>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+              {/* 1. KUTU: CİNSİYET (BAR CHART) */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm"
+              >
+                <div className="flex items-center gap-3 mb-8">
+                  <Users className="w-6 h-6 text-garage-yellow" />
+                  <h3 className="text-xl font-oswald text-white uppercase tracking-wide">Cinsiyet Dağılımı</h3>
+                </div>
+
+                <div className="space-y-8">
+                  <div>
+                    <div className="flex justify-between text-sm font-bold uppercase tracking-widest mb-2">
+                      <span>Erkek</span>
+                      <span className="text-garage-yellow">{SITE_DATA.audience.gender.male}%</span>
+                    </div>
+                    <div className="h-4 bg-white/10 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${SITE_DATA.audience.gender.male}%` }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.5, ease: "circOut" }}
+                        className="h-full bg-garage-yellow"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-sm font-bold uppercase tracking-widest mb-2">
+                      <span>Kadın</span>
+                      <span className="text-white">{SITE_DATA.audience.gender.female}%</span>
+                    </div>
+                    <div className="h-4 bg-white/10 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${SITE_DATA.audience.gender.female}%` }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.5, ease: "circOut", delay: 0.2 }}
+                        className="h-full bg-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* 2. KUTU: ŞEHİRLER (DONUT CHART) */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm flex flex-col items-center"
+              >
+                <div className="flex items-center gap-3 mb-6 w-full">
+                  <MapPin className="w-6 h-6 text-garage-yellow" />
+                  <h3 className="text-xl font-oswald text-white uppercase tracking-wide">Lokasyon</h3>
+                </div>
+
+                <DonutChart data={SITE_DATA.audience.cities} />
+
+                <div className="grid grid-cols-2 gap-x-8 gap-y-3 mt-6 w-full">
+                  {SITE_DATA.audience.cities.map((city, i) => (
+                    <div key={i} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: city.color }} />
+                        <span className="text-gray-300">{city.name}</span>
+                      </div>
+                      <span className="font-bold text-white">%{city.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* 3. KUTU: YAŞ DAĞILIMI (VERTICAL BARS) */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm"
+              >
+                <div className="flex items-center gap-3 mb-8">
+                  <BarChart3 className="w-6 h-6 text-garage-yellow" />
+                  <h3 className="text-xl font-oswald text-white uppercase tracking-wide">Yaş Aralığı</h3>
+                </div>
+
+                <div className="flex items-end justify-between h-48 gap-4">
+                  {SITE_DATA.audience.ages.map((age, i) => (
+                    <div key={i} className="flex flex-col items-center gap-2 flex-1 group">
+                      <span className="text-garage-yellow font-bold text-sm opacity-0 group-hover:opacity-100 transition-opacity">%{age.value}</span>
+                      <div className="w-full bg-white/10 rounded-t-lg relative overflow-hidden flex-1 flex items-end">
+                        <motion.div
+                          initial={{ height: 0 }}
+                          whileInView={{ height: `${age.value * 2}%` }} // Görsel olarak ölçekledik
+                          viewport={{ once: true }}
+                          transition={{ duration: 1, delay: i * 0.1 }}
+                          className={`w-full ${i === 0 ? 'bg-white' : i === 1 ? 'bg-garage-yellow' : 'bg-gray-600'}`}
+                        />
+                      </div>
+                      <span className="text-xs font-bold text-gray-400">{age.range}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* PORTFOLIO */}
         <section className="py-24 md:py-32">
           <div className="container mx-auto px-6">
             <SectionHeading subtitle="KANIT">VİRAL İÇERİKLER</SectionHeading>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
               {SITE_DATA.portfolio.map((video) => (
                 <VideoCard
@@ -491,80 +616,16 @@ export default function Home() {
           </div>
         </section>
 
-        {/* --- AUDIENCE --- */}
-        <section className="py-24 relative overflow-hidden">
-          <div className="absolute right-0 top-1/4 w-1/2 h-1/2 bg-garage-yellow/5 blur-[120px] rounded-full" />
-
-          <div className="container mx-auto px-6 relative z-10">
-            <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-2xl p-8 md:p-16">
-              <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-center">
-                <div>
-                  <SectionHeading subtitle="HEDEF KİTLE">KİM BİZİ İZLİYOR?</SectionHeading>
-                  <div className="space-y-8 mt-10">
-                    <div>
-                      <div className="flex justify-between text-base font-bold uppercase tracking-widest mb-3">
-                        <span>Erkek</span>
-                        <span className="text-garage-yellow">92%</span>
-                      </div>
-                      <div className="h-3 bg-white/10 rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          whileInView={{ width: "92%" }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 1.5, ease: "circOut" }}
-                          className="h-full bg-garage-yellow"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-base font-bold uppercase tracking-widest mb-3">
-                        <span>Yaş 18-34</span>
-                        <span className="text-garage-yellow">85%</span>
-                      </div>
-                      <div className="h-3 bg-white/10 rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          whileInView={{ width: "85%" }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 1.5, ease: "circOut", delay: 0.2 }}
-                          className="h-full bg-white"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  {['Mühendislik', 'Modifiye', 'Teknoloji', 'Motorsporları', 'Restorasyon', 'Sokak Kültürü'].map((item, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.1 }}
-                      className="flex items-center justify-center p-6 border border-white/10 rounded-lg bg-black/40 hover:bg-garage-yellow hover:border-garage-yellow hover:text-black transition-all duration-300 cursor-default group"
-                    >
-                      <span className="font-bold uppercase tracking-wider text-xs md:text-sm text-center">{item}</span>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* --- FOOTER --- */}
+        {/* FOOTER */}
         <footer className="py-24 bg-black border-t border-white/10">
           <div className="container mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-5xl font-bold font-oswald text-white mb-10">BİRLİKTE TARİH YAZALIM</h2>
-
             <button onClick={() => setIsModalOpen(true)} className="group relative inline-block mb-16 z-50">
               <span className="text-3xl md:text-6xl font-bold text-garage-yellow group-hover:text-white transition-colors">
                 {SITE_DATA.contact.email}
               </span>
               <span className="absolute -bottom-2 left-0 w-full h-1 bg-garage-yellow origin-left transform scale-x-100 group-hover:scale-x-0 transition-transform duration-300"></span>
             </button>
-
             <div className="flex justify-center gap-8 mb-12 relative z-50">
               <a href={SITE_DATA.contact.instagram} target="_blank" rel="noopener noreferrer" className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
                 <Instagram className="w-6 h-6" />
@@ -576,7 +637,6 @@ export default function Home() {
                 <Mail className="w-6 h-6" />
               </button>
             </div>
-
             <div className="text-gray-600 text-xs md:text-sm uppercase tracking-[0.2em]">
               © 2025 Gizli Garaj Media. All Rights Reserved.
             </div>
