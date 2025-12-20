@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef, useId } from "react";
 import { motion, AnimatePresence, useInView, useSpring, useMotionValue, useTransform, useScroll } from "framer-motion";
-import { TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X, Film, Target, MonitorPlay, Package, Megaphone, ChevronDown, MapPin, BarChart3, Activity } from "lucide-react";
-import { cn } from "@/lib/utils"; // Az önce oluşturduğun dosya
+import { TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, Copy, Check, MessageCircle, X, Film, Target, MonitorPlay, Package, Megaphone, MapPin, BarChart3, Activity } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // ==========================================
 // ✨ SPARKLES (KIVILCIM) MOTORU
@@ -25,7 +25,7 @@ const SparklesCore = (props: {
     minSize = 0.6,
     maxSize = 1.4,
     particleDensity = 100,
-    particleColor = "#FFD700", // GARAJ SARISI
+    particleColor = "#FFD700",
     speed = 1,
   } = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -87,12 +87,11 @@ const SparklesCore = (props: {
       id={id || canvasId}
       className={cn("absolute inset-0 h-full w-full pointer-events-none", className)}
       style={{ background }}
-      width={1200} // Varsayılan, resize ile güncellenecek
+      width={1200}
       height={800}
     />
   );
 };
-
 
 // ==========================================
 // 🎛️ AYARLAR VE VERİ YÖNETİM PANELİ
@@ -105,6 +104,7 @@ const SITE_DATA = {
     instagram: "https://www.instagram.com/gizligaraj",
     youtube: "https://www.youtube.com/@gizligaraj",
   },
+  // INSTAGRAM VERİLERİ (GÜNCEL)
   audience: {
     cities: [
       { name: "İstanbul", value: 42, color: "#FFD700" },
@@ -293,7 +293,7 @@ const AnimatedNumber = ({ value, suffix }: { value: number, suffix: string }) =>
   }, [isInView, value, motionValue]);
 
   const displayValue = useTransform(springValue, (latest) => {
-    if (Number.isInteger(value)) {
+    if (Number.isInteger(latest)) {
       return Math.round(latest).toString();
     }
     return latest.toFixed(1);
@@ -373,11 +373,21 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // --- PARALLAX VE SCROLL ---
-  const { scrollYProgress } = useScroll();
-  const doorY = useTransform(scrollYProgress, [0, 0.4], ["0%", "-100%"], { clamp: true });
-  const textOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0], { clamp: true });
-  const bgScale = useTransform(scrollYProgress, [0, 0.4], [1, 1.1], { clamp: true });
+  // --- ZOOM PARALLAX & SCROLL AYARLARI (Geri Getirildi) ---
+  const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
+
+  // Hero animasyonları: Scroll yaptıkça scale artar (zoom), opacity düşer
+  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 50]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
+  const heroTextY = useTransform(scrollYProgress, [0, 0.5], [0, 500]);
+
+  // İçerik animasyonu: Hero bittikten sonra içerik yukarı kayar
+  const contentY = useTransform(scrollYProgress, [0.4, 1], ["100vh", "0vh"]);
+
 
   const handleCopyMail = () => {
     navigator.clipboard.writeText(SITE_DATA.contact.email);
@@ -456,65 +466,72 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* ⭐⭐⭐ GARAJ KAPISI (HERO) ⭐⭐⭐ */}
-      <motion.section
-        style={{ y: doorY }}
-        className="fixed inset-0 z-50 h-screen w-full overflow-hidden bg-garage-black flex flex-col items-center justify-center shadow-2xl"
-      >
-        <div className="absolute inset-0 z-0 pointer-events-none select-none">
-          <div className="absolute inset-0 bg-gradient-to-t from-garage-black via-garage-black/90 to-garage-black/50 z-20" />
-          <motion.div style={{ scale: bgScale }} className="absolute inset-0">
-            <img
+      {/* ⭐⭐⭐ ZOOM PARALLAX HERO SECTION (Geri Getirildi) ⭐⭐⭐ */}
+      <div ref={containerRef} className="relative h-[250vh]">
+
+        <div className="sticky top-0 h-screen overflow-hidden flex flex-col items-center justify-center">
+
+          {/* ARKA PLAN + SPARKLES (ZOOMLU) */}
+          <div className="absolute inset-0 z-0 pointer-events-none select-none">
+            <div className="absolute inset-0 bg-gradient-to-t from-garage-black via-garage-black/80 to-transparent z-20" />
+            <div className="absolute inset-0 bg-black/50 z-[10]" />
+            <motion.img
+              style={{ scale: useTransform(scrollYProgress, [0, 1], [1, 1.5]) }}
               src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=2560&auto=format&fit=crop"
               alt="Garage Atmosphere"
-              className="w-full h-full object-cover opacity-60"
+              className="w-full h-full object-cover"
             />
-          </motion.div>
+            {/* ✨✨✨ KIVILCIM EFEKTİ BURADA ✨✨✨ */}
+            <SparklesCore
+              id="tsparticlesfullpage"
+              background="transparent"
+              minSize={0.6}
+              maxSize={1.4}
+              particleDensity={70}
+              className="w-full h-full z-10"
+              particleColor="#FFD700"
+            />
+          </div>
 
-          {/* ✨✨✨ KIVILCIM EFEKTİ BURADA ✨✨✨ */}
-          <SparklesCore
-            id="tsparticlesfullpage"
-            background="transparent"
-            minSize={0.6}
-            maxSize={1.4}
-            particleDensity={70}
-            className="w-full h-full"
-            particleColor="#FFD700"
-          />
-        </div>
-        <motion.div style={{ opacity: textOpacity }} className="relative z-30 text-center px-4">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
-            <h1 className="text-[15vw] md:text-[12vw] leading-[0.85] font-bold font-oswald text-white tracking-tighter mb-4 whitespace-nowrap drop-shadow-2xl">
+          {/* ZOOM YAPILACAK DEV YAZI */}
+          <motion.div
+            style={{ scale: heroScale, opacity: heroOpacity, y: heroTextY }}
+            className="relative z-30 text-center origin-center px-4"
+          >
+            <h1 className="text-[13vw] md:text-[8vw] leading-[0.85] font-bold font-oswald text-transparent bg-clip-text bg-gradient-to-b from-white to-neutral-600 tracking-tighter mb-6 whitespace-nowrap">
               GİZLİ <span className="text-garage-yellow">GARAJ</span>
             </h1>
+            <p className="text-xl md:text-3xl text-gray-300 font-light tracking-wide max-w-2xl mx-auto border-l-4 border-garage-yellow pl-6">
+              Otomobil Dünyasının <span className="text-white font-semibold">Suç Dosyaları</span>
+            </p>
           </motion.div>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.5 }} className="text-xl md:text-3xl text-gray-300 font-light tracking-wide max-w-2xl mx-auto border-b-4 border-garage-yellow pb-4 md:pb-6 drop-shadow-lg">
-            Otomobil Dünyasının <span className="text-white font-semibold">Suç Dosyaları</span>
-          </motion.p>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1, y: [0, 10, 0] }} transition={{ delay: 1, duration: 2, repeat: Infinity }} className="absolute left-1/2 -translate-x-1/2 mt-16 md:mt-24 flex flex-col items-center text-garage-yellow/70">
-            <span className="text-sm uppercase tracking-[0.3em] mb-2 font-bold">Giriş Yap</span>
-            <ChevronDown className="w-8 h-8 animate-bounce" />
+
+          {/* SCROLL İPUCU */}
+          <motion.div
+            style={{ opacity: useTransform(scrollYProgress, [0, 0.2], [1, 0]) }}
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 text-gray-500 flex flex-col items-center gap-2 z-40"
+          >
+            <span className="text-[10px] uppercase tracking-[0.3em] animate-pulse">Girmek İçin Kaydır</span>
+            <div className="w-[1px] h-12 bg-gradient-to-b from-garage-yellow to-transparent" />
           </motion.div>
-        </motion.div>
-      </motion.section>
 
-      <div className="h-[130vh] pointer-events-none" />
+        </div>
+      </div>
 
-      {/* ⭐⭐⭐ ANA İÇERİK ⭐⭐⭐ */}
-      <div className="relative z-40 bg-garage-black shadow-[0_-50px_100px_rgba(0,0,0,1)]">
+      {/* ⭐⭐⭐ ANA İÇERİK (ZOOM EFEKTİNDEN SONRA GELEN KISIM) ⭐⭐⭐ */}
+      <div className="relative z-40 bg-garage-black -mt-[100vh]">
 
         {/* Buton */}
-        <div className="container mx-auto px-6 py-24 relative z-50 text-center">
+        <div className="container mx-auto px-6 pb-24 relative z-50 text-center">
           <motion.button
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-3 bg-garage-yellow text-black font-bold py-5 px-10 md:px-12 rounded-sm text-xl uppercase tracking-widest hover:bg-white hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_50px_rgba(255,215,0,0.4)] cursor-pointer"
+            className="inline-flex items-center gap-3 bg-garage-yellow text-black font-bold py-4 px-8 md:px-10 rounded-sm text-lg uppercase tracking-widest hover:bg-white hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.3)] cursor-pointer mb-24"
           >
             İşbirliği Başlat
-            <ArrowRight className="w-6 h-6" />
+            <ArrowRight className="w-5 h-5" />
           </motion.button>
         </div>
 
@@ -576,7 +593,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* HEDEF KİTLE ANALİZİ */}
+        {/* ⭐⭐⭐ HEDEF KİTLE ANALİZİ (YENİLENEN GRAFİKLERLE) ⭐⭐⭐ */}
         <section className="py-24 relative overflow-hidden bg-[#0a0a0a]">
           <div className="absolute right-0 top-1/4 w-1/2 h-1/2 bg-garage-yellow/5 blur-[120px] rounded-full" />
 
