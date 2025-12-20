@@ -2,18 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Play, TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail } from "lucide-react";
-
-// ==========================================
-// 🛠️ YARDIMCI FONKSİYONLAR (DOKUNMA)
-// ==========================================
-// YouTube linkinden otomatik ID çeken akıllı fonksiyon
-const getYouTubeId = (url: string) => {
-  if (!url) return null;
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-  return (match && match[2].length === 11) ? match[2] : null;
-};
+import { Play, TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail, ExternalLink } from "lucide-react";
 
 // ==========================================
 // 🎛️ AYARLAR VE VERİ YÖNETİM PANELİ (BURAYI DÜZENLE)
@@ -31,28 +20,33 @@ const SITE_DATA = {
     { value: "17.5M+", label: "Son 30 Günlük Erişim", icon: Users },
     { value: "%100", label: "Organik Büyüme", icon: TrendingUp },
   ],
-  // Viral Videolar Listesi
-  // ARTIK SADECE YOUTUBE LİNKİNİ YAPIŞTIRMAN YETERLİ!
+  // Viral Videolar Listesi (INSTAGRAM REELS UYUMLU)
+  // Not: Instagram otomatik kapak vermez. 'thumbnail' kısmına görsel linki koymalısın.
   portfolio: [
     {
       id: 1,
       title: "LASTİK PATLAMASI",
-      views: "3.2M",
-      videoUrl: "https://www.instagram.com/reel/DSKBtpQiGDr/", // ÖRNEK: Buraya kendi videonun linkini yapıştır
-      tags: ["Viral", "Shorts"]
+      views: "3.1M",
+      // 👇 Videonun Instagram Linki
+      link: "https://www.instagram.com/gizligaraj/",
+      // 👇 Kapak Görseli (Değiştirebilirsin)
+      thumbnail: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=800&auto=format&fit=crop",
+      tags: ["Viral", "Reels"]
     },
     {
       id: 2,
       title: "ŞANZIMAN HATASI",
       views: "1.7M",
-      videoUrl: "https://www.instagram.com/reel/DSTHiwdCNQd/", // ÖRNEK: Linki değiştir
+      link: "https://www.instagram.com/gizligaraj/",
+      thumbnail: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?q=80&w=800&auto=format&fit=crop",
       tags: ["Mekanik", "Fail"]
     },
     {
       id: 3,
-      title: "BENZİN IŞIĞI",
-      views: "1.8M",
-      videoUrl: "", // ÖRNEK: Linki değiştir
+      title: "FERRARİ VAKASI",
+      views: "1.6M",
+      link: "https://www.instagram.com/gizligaraj/",
+      thumbnail: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?q=80&w=800&auto=format&fit=crop",
       tags: ["Lüks", "Kaza"]
     },
   ]
@@ -91,19 +85,10 @@ const StatCard = ({ value, label, icon: Icon, delay }: { value: string; label: s
   </motion.div>
 );
 
-const VideoCard = ({ title, views, videoUrl, tags }: { title: string; views: string; videoUrl: string; tags: string[] }) => {
-  const videoId = getYouTubeId(videoUrl);
-
-  // Eğer link bozuksa veya yoksa placeholder göster
-  const thumbnail = videoId
-    ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
-    : "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=600&auto=format&fit=crop";
-
-  const cleanLink = videoId ? `https://www.youtube.com/watch?v=${videoId}` : "#";
-
+const VideoCard = ({ title, views, link, thumbnail, tags }: { title: string; views: string; link: string; thumbnail: string; tags: string[] }) => {
   return (
     <motion.a
-      href={cleanLink}
+      href={link}
       target="_blank"
       rel="noopener noreferrer"
       initial={{ opacity: 0, scale: 0.95 }}
@@ -112,22 +97,30 @@ const VideoCard = ({ title, views, videoUrl, tags }: { title: string; views: str
       whileHover={{ y: -10 }}
       className="relative group aspect-[9/16] bg-neutral-900 rounded-xl overflow-hidden border border-white/10 cursor-pointer shadow-2xl block z-10"
     >
+      {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-110 opacity-60"
         style={{ backgroundImage: `url('${thumbnail}')` }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90" />
 
+      {/* Play/Instagram Button Overlay */}
       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <div className="w-16 h-16 rounded-full bg-garage-yellow flex items-center justify-center shadow-[0_0_30px_rgba(255,215,0,0.5)]">
-          <Play className="w-6 h-6 text-black fill-black ml-1" />
+          <Instagram className="w-8 h-8 text-black" />
         </div>
       </div>
 
+      {/* Top Right Icon */}
+      <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-md p-2 rounded-full border border-white/10">
+        <Instagram className="w-4 h-4 text-white" />
+      </div>
+
+      {/* Content */}
       <div className="absolute bottom-0 left-0 w-full p-6">
         <div className="flex items-center gap-2 mb-3">
           {tags.map((tag, i) => (
-            <span key={i} className={`text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide ${i === 0 ? 'bg-red-600 text-white' : 'bg-white text-black'}`}>
+            <span key={i} className={`text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide ${i === 0 ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-none' : 'bg-white text-black'}`}>
               {tag}
             </span>
           ))}
@@ -172,7 +165,7 @@ export default function Home() {
               Otomobil Dünyasının <span className="text-white font-semibold">Suç Dosyaları</span> <br /> & Viral İçerik Stüdyosu.
             </p>
 
-            {/* FIXED BUTTON: Z-Index 50 ve Standart <a> etiketi */}
+            {/* FIXED BUTTON */}
             <a
               href={`mailto:${SITE_DATA.contact.email}`}
               className="relative z-50 group inline-flex items-center gap-3 bg-garage-yellow text-black font-bold py-4 px-8 md:px-10 rounded-sm text-lg uppercase tracking-widest hover:bg-white transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.2)] cursor-pointer"
@@ -252,7 +245,8 @@ export default function Home() {
                 key={video.id}
                 title={video.title}
                 views={video.views}
-                videoUrl={video.videoUrl}
+                link={video.link}
+                thumbnail={video.thumbnail}
                 tags={video.tags}
               />
             ))}
