@@ -4,7 +4,53 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Play, TrendingUp, Users, Zap, ArrowRight, Instagram, Youtube, Mail } from "lucide-react";
 
-// --- COMPONENTS ---
+// ==========================================
+// 🎛️ AYARLAR VE VERİ YÖNETİM PANELİ (BURAYI DÜZENLE)
+// ==========================================
+const SITE_DATA = {
+  // İletişim Bilgileri
+  contact: {
+    email: "infogizligaraj@gmail.com",
+    instagram: "https://www.instagram.com/gizligaraj", // Buraya kendi linkini koy
+    youtube: "https://www.youtube.com/@gizligaraj",   // Buraya kendi linkini koy
+  },
+  // İstatistikler
+  stats: [
+    { value: "3.1M+", label: "Tek Video İzlenme Rekoru", icon: Zap },
+    { value: "17.5M+", label: "Son 30 Günlük Erişim", icon: Users }, // Güncellendi
+    { value: "%100", label: "Organik Büyüme", icon: TrendingUp },
+  ],
+  // Viral Videolar Listesi
+  // videoId: YouTube linkindeki "v=" den sonraki koddur. 
+  // Örnek: https://www.youtube.com/watch?v=dQw4w9WgXcQ -> ID: dQw4w9WgXcQ
+  portfolio: [
+    {
+      id: 1,
+      title: "LASTİK PATLAMASI",
+      views: "3.1M",
+      videoId: "VIDEO_ID_YAZ_1", // Buraya gerçek videonun ID'sini yapıştır
+      tags: ["Viral", "Shorts"]
+    },
+    {
+      id: 2,
+      title: "ŞANZIMAN HATASI",
+      views: "1.7M",
+      videoId: "VIDEO_ID_YAZ_2", // Buraya gerçek videonun ID'sini yapıştır
+      tags: ["Mekanik", "Fail"]
+    },
+    {
+      id: 3,
+      title: "FERRARİ VAKASI",
+      views: "1.6M",
+      videoId: "VIDEO_ID_YAZ_3", // Buraya gerçek videonun ID'sini yapıştır
+      tags: ["Lüks", "Kaza"]
+    },
+  ]
+};
+
+// ==========================================
+// 🧩 BİLEŞENLER (DOKUNMAYA GEREK YOK)
+// ==========================================
 
 // 1. Bölüm Başlıkları
 const SectionHeading = ({ children, subtitle }: { children: React.ReactNode; subtitle?: string }) => (
@@ -38,7 +84,7 @@ const SectionHeading = ({ children, subtitle }: { children: React.ReactNode; sub
   </div>
 );
 
-// 2. İstatistik Kartı (Bento Style)
+// 2. İstatistik Kartı
 const StatCard = ({ value, label, icon: Icon, delay }: { value: string; label: string; icon: any; delay: number }) => (
   <motion.div
     initial={{ opacity: 0, y: 30 }}
@@ -54,42 +100,57 @@ const StatCard = ({ value, label, icon: Icon, delay }: { value: string; label: s
   </motion.div>
 );
 
-// 3. Video Placeholder
-const VideoCard = ({ title, views, imageIdx }: { title: string; views: string; imageIdx: number }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.95 }}
-    whileInView={{ opacity: 1, scale: 1 }}
-    viewport={{ once: true }}
-    whileHover={{ y: -10 }}
-    className="relative group aspect-[9/16] bg-neutral-900 rounded-xl overflow-hidden border border-white/10 cursor-pointer shadow-2xl"
-  >
-    {/* Background Image Mockup */}
-    <div
-      className="absolute inset-0 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-110 opacity-60"
-      style={{ backgroundImage: `url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3')` }}
-    />
-    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90" />
+// 3. Akıllı Video Kartı (YouTube Thumbnail Otomatik Çeker)
+const VideoCard = ({ title, views, videoId, tags }: { title: string; views: string; videoId: string; tags: string[] }) => {
+  // Video ID yoksa varsayılan bir görsel göster (Placeholder)
+  const thumbnail = videoId.includes("VIDEO_ID")
+    ? "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=600&auto=format&fit=crop" // Placeholder
+    : `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`; // Gerçek YouTube Kapak Resmi
 
-    {/* Play Button */}
-    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-      <div className="w-16 h-16 rounded-full bg-garage-yellow flex items-center justify-center shadow-[0_0_30px_rgba(255,215,0,0.5)]">
-        <Play className="w-6 h-6 text-black fill-black ml-1" />
-      </div>
-    </div>
+  const videoLink = videoId.includes("VIDEO_ID") ? "#" : `https://www.youtube.com/watch?v=${videoId}`;
 
-    {/* Content */}
-    <div className="absolute bottom-0 left-0 w-full p-6">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide">Viral</span>
-        <span className="bg-white text-black text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide">Shorts</span>
+  return (
+    <motion.a
+      href={videoLink}
+      target="_blank"
+      rel="noopener noreferrer"
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -10 }}
+      className="relative group aspect-[9/16] bg-neutral-900 rounded-xl overflow-hidden border border-white/10 cursor-pointer shadow-2xl block"
+    >
+      {/* Background Image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-700 transform group-hover:scale-110 opacity-60"
+        style={{ backgroundImage: `url('${thumbnail}')` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-90" />
+
+      {/* Play Button */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <div className="w-16 h-16 rounded-full bg-garage-yellow flex items-center justify-center shadow-[0_0_30px_rgba(255,215,0,0.5)]">
+          <Play className="w-6 h-6 text-black fill-black ml-1" />
+        </div>
       </div>
-      <h4 className="text-xl md:text-2xl font-bold text-white font-oswald leading-none mb-2 uppercase">{title}</h4>
-      <p className="text-garage-yellow text-sm font-bold flex items-center gap-2">
-        <TrendingUp className="w-4 h-4" /> {views} Görüntülenme
-      </p>
-    </div>
-  </motion.div>
-);
+
+      {/* Content */}
+      <div className="absolute bottom-0 left-0 w-full p-6">
+        <div className="flex items-center gap-2 mb-3">
+          {tags.map((tag, i) => (
+            <span key={i} className={`text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide ${i === 0 ? 'bg-red-600 text-white' : 'bg-white text-black'}`}>
+              {tag}
+            </span>
+          ))}
+        </div>
+        <h4 className="text-xl md:text-2xl font-bold text-white font-oswald leading-none mb-2 uppercase">{title}</h4>
+        <p className="text-garage-yellow text-sm font-bold flex items-center gap-2">
+          <TrendingUp className="w-4 h-4" /> {views} Görüntülenme
+        </p>
+      </div>
+    </motion.a>
+  );
+};
 
 export default function Home() {
   return (
@@ -126,7 +187,7 @@ export default function Home() {
             <motion.a
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              href="mailto:gizligaraj.pr@gmail.com"
+              href={`mailto:${SITE_DATA.contact.email}`}
               className="group inline-flex items-center gap-3 bg-garage-yellow text-black font-bold py-4 px-8 md:px-10 rounded-sm text-lg uppercase tracking-widest hover:bg-white transition-all duration-300 shadow-[0_0_40px_rgba(255,215,0,0.2)]"
             >
               İşbirliği Başlat
@@ -187,9 +248,9 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <StatCard icon={Zap} value="3.1M+" label="Tek Video İzlenme Rekoru" delay={0.1} />
-            <StatCard icon={Users} value="5M+" label="Aylık Ortalama Erişim" delay={0.2} />
-            <StatCard icon={TrendingUp} value="%100" label="Organik Büyüme" delay={0.3} />
+            {SITE_DATA.stats.map((stat, index) => (
+              <StatCard key={index} icon={stat.icon} value={stat.value} label={stat.label} delay={0.1 * (index + 1)} />
+            ))}
           </div>
         </div>
       </section>
@@ -200,9 +261,15 @@ export default function Home() {
           <SectionHeading subtitle="KANIT">VİRAL İÇERİKLER</SectionHeading>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
-            <VideoCard title="LASTİK PATLAMASI" views="3.1M" imageIdx={1} />
-            <VideoCard title="ŞANZIMAN HATASI" views="1.7M" imageIdx={2} />
-            <VideoCard title="FERRARİ VAKASI" views="1.6M" imageIdx={3} />
+            {SITE_DATA.portfolio.map((video) => (
+              <VideoCard
+                key={video.id}
+                title={video.title}
+                views={video.views}
+                videoId={video.videoId}
+                tags={video.tags}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -278,21 +345,21 @@ export default function Home() {
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-5xl font-bold font-oswald text-white mb-10">BİRLİKTE TARİH YAZALIM</h2>
 
-          <a href="mailto:gizligaraj.pr@gmail.com" className="group relative inline-block mb-16">
+          <a href={`mailto:${SITE_DATA.contact.email}`} className="group relative inline-block mb-16">
             <span className="text-3xl md:text-6xl font-bold text-garage-yellow group-hover:text-white transition-colors">
-              gizligaraj.pr@gmail.com
+              {SITE_DATA.contact.email}
             </span>
             <span className="absolute -bottom-2 left-0 w-full h-1 bg-garage-yellow origin-left transform scale-x-100 group-hover:scale-x-0 transition-transform duration-300"></span>
           </a>
 
           <div className="flex justify-center gap-8 mb-12">
-            <a href="#" className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
+            <a href={SITE_DATA.contact.instagram} target="_blank" rel="noopener noreferrer" className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
               <Instagram className="w-6 h-6" />
             </a>
-            <a href="#" className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
+            <a href={SITE_DATA.contact.youtube} target="_blank" rel="noopener noreferrer" className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
               <Youtube className="w-6 h-6" />
             </a>
-            <a href="mailto:gizligaraj.pr@gmail.com" className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
+            <a href={`mailto:${SITE_DATA.contact.email}`} className="p-4 rounded-full bg-white/5 border border-white/10 hover:bg-garage-yellow hover:text-black hover:border-garage-yellow transition-all duration-300 transform hover:scale-110">
               <Mail className="w-6 h-6" />
             </a>
           </div>
