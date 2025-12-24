@@ -155,15 +155,15 @@ const SITE_DATA = {
     }
   ],
   stats: [
-    { number: 3.1, suffix: "M+", label: "Tek Video İzlenme Rekoru", icon: Zap },
-    { number: 19.4, suffix: "M+", label: "Son 30 Günlük Erişim", icon: Users },
+    { number: 3.4, suffix: "M+", label: "Tek Video İzlenme Rekoru", icon: Zap },
+    { number: 20.2, suffix: "M+", label: "Son 30 Günlük Erişim", icon: Users },
     { number: 415, suffix: "K+", label: "Aylık Etkileşim", icon: Activity },
   ],
   portfolio: [
     {
       id: 1,
       title: "LASTİK PATLAMASI",
-      views: "3.2M",
+      views: "3.4M",
       link: "https://www.instagram.com/reel/DSKBtpQiGDr/",
       thumbnail: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=800&auto=format&fit=crop",
       tags: ["Viral", "Reels"]
