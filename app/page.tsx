@@ -104,7 +104,11 @@ const SITE_DATA = {
     instagram: "https://www.instagram.com/gizligaraj",
     youtube: "https://www.youtube.com/@gizligaraj",
   },
-  // INSTAGRAM VERİLERİ (GÜNCEL)
+  // REFERANS MARKALAR (Logoları buraya ekliyoruz)
+  clients: [
+    { name: "Silecek Sepeti", logo: "https://www.sileceksepeti.com/shop/dt/24/themes/selftpl_6597b7e9508d8/assets/uploads/logo.png?revision=1768221317" },
+    { name: "Myikas", logo: "https://cdn.myikas.com/images/theme-images/abe44084-a8f8-4bce-81d7-4ed373bd20ec/image_540.webp" },
+  ],
   audience: {
     cities: [
       { name: "İstanbul", value: 42, color: "#FFD700" },
@@ -155,34 +159,34 @@ const SITE_DATA = {
     }
   ],
   stats: [
-    { number: 3.4, suffix: "M+", label: "Tek Video İzlenme Rekoru", icon: Zap },
-    { number: 20.2, suffix: "M+", label: "Son 30 Günlük Erişim", icon: Users },
+    { number: 6.4, suffix: "M+", label: "Tek Video İzlenme Rekoru", icon: Zap },
+    { number: 19.4, suffix: "M+", label: "Son 30 Günlük Erişim", icon: Users },
     { number: 415, suffix: "K+", label: "Aylık Etkileşim", icon: Activity },
   ],
   portfolio: [
     {
       id: 1,
-      title: "LASTİK PATLAMASI",
-      views: "3.4M",
-      link: "https://www.instagram.com/reel/DSKBtpQiGDr/",
+      title: "MOTORU ISITMAYIN",
+      views: "6.4M",
+      link: "https://www.instagram.com/gizligaraj/reel/DS97TCajRl-/",
       thumbnail: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?q=80&w=800&auto=format&fit=crop",
       tags: ["Viral", "Reels"]
     },
     {
       id: 2,
-      title: "ŞANZIMAN HATASI",
-      views: "1.7M",
-      link: "https://www.instagram.com/reel/DSTHiwdCNQd/",
+      title: "LASTİK PATLAMASI",
+      views: "4.5M",
+      link: "https://www.instagram.com/reel/DSKBtpQiGDr/",
       thumbnail: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?q=80&w=800&auto=format&fit=crop",
       tags: ["Mekanik", "Fail"]
     },
     {
       id: 3,
-      title: "BENZİN POMPASI",
-      views: "1.8M",
-      link: "https://www.instagram.com/reel/DSZ7QKqjTkt/",
+      title: "PARK ETME",
+      views: "2.8M",
+      link: "https://www.instagram.com/reel/DScEDXZCM6e/",
       thumbnail: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?q=80&w=800&auto=format&fit=crop",
-      tags: ["Lüks", "Kaza"]
+      tags: ["Pratik", "Kaza"]
     },
   ]
 };
@@ -204,6 +208,63 @@ const SectionHeading = ({ children, subtitle }: { children: React.ReactNode; sub
     <div className="h-1 w-24 bg-garage-yellow mt-6" />
   </div>
 );
+
+// --- MARQUEE (SONSUZ LOGO DÖNGÜSÜ) ---
+const LogoMarquee = () => {
+  const repeatedClients = [...SITE_DATA.clients, ...SITE_DATA.clients, ...SITE_DATA.clients];
+
+  return (
+    <div className="relative flex overflow-hidden py-10 bg-garage-black border-y border-white/5">
+      {/* Sol ve Sağ Kenar Yumuşatma Efekti */}
+      <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-garage-black to-transparent z-10" />
+      <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-garage-black to-transparent z-10" />
+
+      <div className="flex whitespace-nowrap">
+        {/* Satır 1 */}
+        <motion.div
+          className="flex gap-24 items-center pr-24 flex-shrink-0"
+          animate={{ x: "-100%" }}
+          transition={{
+            ease: "linear",
+            duration: 40,
+            repeat: Infinity,
+          }}
+        >
+          {repeatedClients.map((client, i) => (
+            <div key={i} className="flex-shrink-0 group">
+              <img
+                src={client.logo}
+                alt={client.name}
+                className="h-12 md:h-16 w-auto object-contain grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 cursor-pointer filter brightness-200 contrast-0 group-hover:filter-none"
+              />
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Satır 2 (Yedek) */}
+        <motion.div
+          className="flex gap-24 items-center pr-24 flex-shrink-0"
+          animate={{ x: "-100%" }}
+          transition={{
+            ease: "linear",
+            duration: 40,
+            repeat: Infinity,
+          }}
+        >
+          {repeatedClients.map((client, i) => (
+            <div key={i} className="flex-shrink-0 group">
+              <img
+                src={client.logo}
+                alt={client.name}
+                className="h-12 md:h-16 w-auto object-contain grayscale opacity-30 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 cursor-pointer filter brightness-200 contrast-0 group-hover:filter-none"
+              />
+            </div>
+          ))}
+        </motion.div>
+      </div>
+    </div>
+  );
+};
 
 const DonutChart = ({ data }: { data: typeof SITE_DATA.audience.cities }) => {
   const radius = 80;
@@ -369,7 +430,6 @@ const VideoCard = ({ title, views, link, thumbnail, tags }: { title: string; vie
   );
 };
 
-// ⚡ YENİLENMİŞ DİKKAT ÇEKİCİ İŞBİRLİĞİ BUTONU
 const CtaButton = ({ onClick, className }: { onClick?: () => void, className?: string }) => {
   return (
     <motion.button
@@ -384,16 +444,12 @@ const CtaButton = ({ onClick, className }: { onClick?: () => void, className?: s
         className
       )}
     >
-      {/* Arka Plan Parlama Efekti */}
       <div className="absolute inset-0 bg-white/20 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-      {/* Yanıp Sönen Işık Efekti */}
       <motion.div
         className="absolute -inset-1 bg-gradient-to-r from-transparent via-white/30 to-transparent blur-sm group-hover:via-white/50"
         animate={{ x: ['-100%', '200%'] }}
         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
       />
-
       <span className="relative z-10">İşbirliği Başlat</span>
       <ArrowRight className="relative z-10 w-7 h-7 group-hover:translate-x-1 transition-transform" />
     </motion.button>
@@ -404,19 +460,16 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // --- ZOOM PARALLAX & SCROLL AYARLARI ---
+  // --- ZOOM PARALLAX ---
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"]
   });
 
-  // Hero animasyonları
   const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 50]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0]);
   const heroTextY = useTransform(scrollYProgress, [0, 0.5], [0, 500]);
-
-  // İçerik animasyonu
   const contentY = useTransform(scrollYProgress, [0.4, 1], ["100vh", "0vh"]);
 
 
@@ -497,12 +550,9 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* ⭐⭐⭐ ZOOM PARALLAX HERO SECTION ⭐⭐⭐ */}
+      {/* ⭐⭐⭐ HERO SECTION ⭐⭐⭐ */}
       <div ref={containerRef} className="relative h-[250vh]">
-
         <div className="sticky top-0 h-screen overflow-hidden flex flex-col items-center justify-center">
-
-          {/* ARKA PLAN + SPARKLES */}
           <div className="absolute inset-0 z-0 pointer-events-none select-none">
             <div className="absolute inset-0 bg-gradient-to-t from-garage-black via-garage-black/80 to-transparent z-20" />
             <div className="absolute inset-0 bg-black/50 z-[10]" />
@@ -523,7 +573,6 @@ export default function Home() {
             />
           </div>
 
-          {/* ZOOM YAPILACAK DEV YAZI */}
           <motion.div
             style={{ scale: heroScale, opacity: heroOpacity, y: heroTextY }}
             className="relative z-30 text-center origin-center px-4"
@@ -536,7 +585,6 @@ export default function Home() {
             </p>
           </motion.div>
 
-          {/* SCROLL İPUCU */}
           <motion.div
             style={{ opacity: useTransform(scrollYProgress, [0, 0.2], [1, 0]) }}
             className="absolute bottom-10 left-1/2 -translate-x-1/2 text-gray-500 flex flex-col items-center gap-2 z-40"
@@ -544,14 +592,12 @@ export default function Home() {
             <span className="text-[10px] uppercase tracking-[0.3em] animate-pulse">Girmek İçin Kaydır</span>
             <ChevronDown className="w-8 h-8 animate-bounce" />
           </motion.div>
-
         </div>
       </div>
 
-      {/* ⭐⭐⭐ ANA İÇERİK (ZOOM EFEKTİNDEN SONRA GELEN KISIM) ⭐⭐⭐ */}
+      {/* ⭐⭐⭐ ANA İÇERİK ⭐⭐⭐ */}
       <div className="relative z-40 bg-garage-black -mt-[100vh]">
 
-        {/* YENİLENMİŞ İŞBİRLİĞİ BUTONU */}
         <div className="container mx-auto px-6 pb-24 relative z-50 text-center">
           <CtaButton onClick={() => setIsModalOpen(true)} className="mb-24" />
         </div>
@@ -588,18 +634,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* HİZMETLER */}
-        <section className="py-24 bg-gradient-to-b from-[#080808] to-[#111] border-t border-white/5">
-          <div className="container mx-auto px-6">
-            <SectionHeading subtitle="İŞ MODELLERİ">HİZMETLERİMİZ</SectionHeading>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {SITE_DATA.services.map((service, i) => (
-                <ServiceCard key={i} title={service.title} desc={service.desc} icon={service.icon} delay={0.2 * i} />
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* RAKAMLAR */}
         <section className="py-24 bg-[#080808] relative border-y border-white/5">
           <div className="container mx-auto px-6">
@@ -614,7 +648,31 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ⭐⭐⭐ HEDEF KİTLE ANALİZİ (YÜZDELER SABİTLENDİ) ⭐⭐⭐ */}
+        {/* ⭐⭐⭐ YENİ BÖLÜM: REFERANSLAR (SONSUZ LOGO DÖNGÜSÜ) ⭐⭐⭐ */}
+        <section className="relative z-10">
+          <div className="container mx-auto px-6 mb-8">
+            <div className="flex items-center gap-4">
+              <div className="h-[1px] bg-white/20 flex-1" />
+              <span className="text-sm font-bold text-garage-gray uppercase tracking-[0.3em]">Bize Güvenenler</span>
+              <div className="h-[1px] bg-white/20 flex-1" />
+            </div>
+          </div>
+          <LogoMarquee />
+        </section>
+
+        {/* HİZMETLER */}
+        <section className="py-24 bg-gradient-to-b from-[#080808] to-[#111] border-t border-white/5">
+          <div className="container mx-auto px-6">
+            <SectionHeading subtitle="İŞ MODELLERİ">HİZMETLERİMİZ</SectionHeading>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {SITE_DATA.services.map((service, i) => (
+                <ServiceCard key={i} title={service.title} desc={service.desc} icon={service.icon} delay={0.2 * i} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* HEDEF KİTLE ANALİZİ */}
         <section className="py-24 relative overflow-hidden bg-[#0a0a0a]">
           <div className="absolute right-0 top-1/4 w-1/2 h-1/2 bg-garage-yellow/5 blur-[120px] rounded-full" />
 
@@ -682,7 +740,7 @@ export default function Home() {
                 </div>
               </motion.div>
 
-              {/* 3. KUTU: YAŞ DAĞILIMI (YÜZDELER SABİTLENDİ) */}
+              {/* 3. KUTU: YAŞ DAĞILIMI */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -697,7 +755,6 @@ export default function Home() {
                 <div className="flex items-end justify-between h-48 gap-4">
                   {SITE_DATA.audience.ages.map((age, i) => (
                     <div key={i} className="flex flex-col items-center gap-2 flex-1 group">
-                      {/* ⚡ GÜNCELLEME: Yüzde değeri artık hep görünür */}
                       <span className="text-garage-yellow font-bold text-sm transition-opacity">%{age.value}</span>
                       <div className="w-full bg-white/10 rounded-t-lg relative overflow-hidden flex-1 flex items-end">
                         <motion.div initial={{ height: 0 }} whileInView={{ height: `${age.value * 2}%` }} viewport={{ once: true }} transition={{ duration: 1, delay: i * 0.1 }} className={`w-full ${i === 0 ? 'bg-white' : i === 1 ? 'bg-garage-yellow' : 'bg-gray-600'}`} />
@@ -735,7 +792,6 @@ export default function Home() {
           <div className="container mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-5xl font-bold font-oswald text-white mb-10">BİRLİKTE TARİH YAZALIM</h2>
 
-            {/* YENİLENMİŞ FOOTER BUTONU */}
             <CtaButton onClick={() => setIsModalOpen(true)} className="mb-16" />
 
             <div className="flex justify-center gap-8 mb-12 relative z-50">
